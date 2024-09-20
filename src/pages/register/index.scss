@@ -1,0 +1,43 @@
+.body {
+    background-color: #f3f5fa;
+    min-width: 100vw;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  
+    .registerBox {
+      background-color: white;
+      padding: 30px;
+      border-radius: 5px;
+      -webkit-border-radius: 5px;
+      -moz-border-radius: 5px;
+      -ms-border-radius: 5px;
+      -o-border-radius: 5px;
+  
+      min-width: 400px;
+      // min-height: 500px;
+  
+      h1{
+          display: flex;
+          justify-content: center;
+          margin-bottom: 30px;
+          color: #1677ff;
+      }
+  
+      p{
+          color: gray;
+          font-size: 12px;
+          margin-bottom: 30px;
+      }
+  
+      .toLogin{
+        color: #1677ff;
+        font-size: 14px;
+        cursor: pointer;
+      }
+  
+      
+    }
+  }
+  

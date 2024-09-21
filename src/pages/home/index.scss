@@ -1,7 +1,8 @@
 .homeBody{
     display: flex;
     flex-direction: column;
-    min-width: 100vw;
+    max-width: 100vw;
     min-height: 100vh;
-    background-color: #f3f5fa;
+    background-color: #f9f9fa;
+    box-sizing: border-box;
 }

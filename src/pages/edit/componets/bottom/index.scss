@@ -1,0 +1,33 @@
+.myEditorBottomBox {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  background-color: white;
+  height: 80px;
+  width: 100%;
+  z-index: 999;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border:1px solid #e8e8e8;
+
+  .left{
+    margin-left: 30px;
+  }
+
+  .right {
+
+    margin-right: 30px;
+
+    .myEditorBottomButton {
+        padding: 10px 20px;
+        border-radius: 20px;
+        -webkit-border-radius: 20px;
+        -moz-border-radius: 20px;
+        -ms-border-radius: 20px;
+        -o-border-radius: 20px;
+
+        height: 42px;
+}
+  }
+}

@@ -7,6 +7,8 @@ import Register from "../pages/register";
 import { lazy, Suspense } from "react";
 
 const Blog=lazy(()=>import('../pages/home/components/blog'))
+const Edit=lazy(()=>import("../pages/edit"))
+const Article=lazy(()=>import("../pages/article"))
 
 const router = createBrowserRouter([
   {
@@ -16,6 +18,22 @@ const router = createBrowserRouter([
   {
     path:'/register',
     element:<Register></Register>
+  },
+  {
+    path:'edit',
+    element:(
+      <Suspense fallback={'加载中……'}>
+        <Edit></Edit>
+      </Suspense>
+    )
+  },
+  {
+    path:'article/:id',
+    element:(
+      <Suspense fallback={'加载中……'}>
+        <Article></Article>
+      </Suspense>
+    )
   },
   {
     path:'/',

@@ -1,13 +1,11 @@
-import Header from "./components/header";
-import Body from "./components/body";
-
-import {  ConfigProvider } from "antd";
-
-import { Outlet } from "react-router-dom";
-
 import "./index.scss";
 
-export default function Home() {
+import Header from "../home/components/header";
+import Content from "./components/content";
+
+import { ConfigProvider } from "antd";
+
+export default function Article() {
   return (
     <ConfigProvider
       theme={{
@@ -15,15 +13,15 @@ export default function Home() {
           // Seed Token，影响范围大
           colorPrimary: "#ff4d4f",
           borderRadius: 4,
+
           // 派生变量，影响范围小
           colorBgContainer: "#fff",
         },
       }}
     >
-      <div className="homeBody">
+      <div className="articleBox">
         <Header></Header>
-        <Body></Body>
-        <Outlet></Outlet>
+        <Content></Content>
       </div>
     </ConfigProvider>
   );

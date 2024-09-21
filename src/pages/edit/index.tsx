@@ -1,20 +1,25 @@
-import Header from "./components/header";
-import Body from "./components/body";
+
+import "../edit/index.scss"
+
+import Header from "../home/components/header";
+import MyEditor from "../edit/componets/editor"
+
+import Settings from "./componets/settings";
+import Buttom from "./componets/bottom";
 
 import {  ConfigProvider } from "antd";
 
-import { Outlet } from "react-router-dom";
 
-import "./index.scss";
+export default function Edit(){
 
-export default function Home() {
-  return (
-    <ConfigProvider
+    return (
+        <ConfigProvider
       theme={{
         token: {
           // Seed Token，影响范围大
           colorPrimary: "#ff4d4f",
           borderRadius: 4,
+
           // 派生变量，影响范围小
           colorBgContainer: "#fff",
         },
@@ -22,9 +27,10 @@ export default function Home() {
     >
       <div className="homeBody">
         <Header></Header>
-        <Body></Body>
-        <Outlet></Outlet>
+        <MyEditor></MyEditor>
+        <Settings></Settings>
+        <Buttom></Buttom>
       </div>
     </ConfigProvider>
-  );
+    )
 }

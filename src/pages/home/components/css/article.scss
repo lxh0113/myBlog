@@ -1,0 +1,62 @@
+
+.articleBox{
+    display: flex;
+    width: 100%;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+
+    padding: 10px;
+    box-sizing: border-box;
+
+    .left{
+        img{
+            width: 300px;
+            height: 200px;
+            object-fit: cover;
+        }
+    }
+
+    .right{
+        flex:1;
+        margin-left: 20px;
+        // background-color: pink;
+
+        .articleTitle{
+            height: 50px;
+            padding: 10px;
+            line-height: 50px;
+            box-sizing: border-box;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .articleContent{
+            height: 120px;
+            padding: 10px;
+            box-sizing: border-box;
+            font-size: 15px;
+
+        }
+
+        .bottom{
+            display: flex;
+
+            span{
+                margin-left: 12px;
+                cursor: pointer;
+
+                span{
+                    margin-left: 5px;
+                }
+            }
+
+            span:nth-child(4),
+            span:nth-child(6){
+                
+                &:hover{
+                    color: red;
+                }
+            }
+        }
+    }
+}

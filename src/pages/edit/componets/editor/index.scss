@@ -1,0 +1,53 @@
+
+.myEditorTitleInputBox{
+
+    width: 100%;
+    display: flex;
+    justify-content: center;
+
+    .editorTitle{
+        margin: 0 auto;
+        margin-top: 30px;
+        width: 100%;
+        max-width: 1000px;
+        border-radius: 10px 10px 0px 0px;
+        -webkit-border-radius: 10px 10px 0px 0px;
+        -moz-border-radius: 10px 10px 0px 0px;
+        -ms-border-radius: 10px 10px 0px 0px;
+        -o-border-radius: 10px 10px 0px 0px;
+        height: 50px;
+        border:0;
+        font-weight: bold;
+        font-size: 20px;
+
+        // box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+        z-index: 2;
+    }
+}
+
+.myToolbar{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+
+    box-sizing: border-box;
+    background-color: white;
+}
+
+
+.myEditor{
+    width: 100%;
+    max-width: 1000px;
+    margin: 0px auto;
+    border-radius: 0px 0px 10px 10px;
+    -webkit-border-radius: 0px 0px 10px 10px;
+    -moz-border-radius: 0px 0px 10px 10px;
+    -ms-border-radius: 0px 0px 10px 10px;
+    -o-border-radius: 0px 0px 10px 10px;
+
+    padding: 30px;
+    box-sizing: border-box;
+    background-color: white;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    z-index: 5;
+}

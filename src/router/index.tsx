@@ -9,6 +9,10 @@ import { lazy, Suspense } from "react";
 const Blog=lazy(()=>import('../pages/home/components/blog'))
 const Edit=lazy(()=>import("../pages/edit"))
 const Article=lazy(()=>import("../pages/article"))
+const Profile=lazy(()=>import("../pages/profile"))
+const Search=lazy(()=>import("../pages/search"))
+const Content=lazy(()=>import("../pages/content"))
+const Meesgae=lazy(()=>import("../pages/message"))
 
 const router = createBrowserRouter([
   {
@@ -32,6 +36,38 @@ const router = createBrowserRouter([
     element:(
       <Suspense fallback={'加载中……'}>
         <Article></Article>
+      </Suspense>
+    )
+  },
+  {
+    path:'search/:word',
+    element:(
+      <Suspense fallback={'加载中……'}>
+        <Search></Search>
+      </Suspense>
+    )
+  },
+  {
+    path:'content',
+    element:(
+      <Suspense fallback={'加载中……'}>
+        <Content></Content>
+      </Suspense>
+    )
+  },
+  {
+    path:'message/:key',
+    element:(
+      <Suspense fallback={'加载中……'}>
+        <Meesgae></Meesgae>
+      </Suspense>
+    )
+  },
+  {
+    path:'profile',
+    element:(
+      <Suspense fallback={'加载中……'}>
+        <Profile></Profile>
       </Suspense>
     )
   },

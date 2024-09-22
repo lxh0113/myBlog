@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Affix, Button, Space, Input } from "antd";
 import { Carousel } from "antd";
 
-import { SearchOutlined } from "@ant-design/icons";
+import { LockFilled, SearchOutlined } from "@ant-design/icons";
 
 import "./css/body.scss";
 import logoText from "../../../assets/image/logoText.png";
@@ -11,6 +11,7 @@ import slider1 from "../../../assets/slider/1.gif"
 import slider2 from "../../../assets/slider/2.gif"
 import slider3 from "../../../assets/slider/3.gif"
 import slider4 from "../../../assets/slider/4.gif"
+import { useNavigate } from "react-router-dom";
 
 export default function Body() {
   let [affix, setAffix] = useState(false);
@@ -27,16 +28,28 @@ export default function Body() {
    slider4,
   ]
 
+  const navigate=useNavigate()
+  const [searchText,setSearchText]=useState('')
+
+  const toSearch=(e?:any)=>{
+    if(e.key==='Enter')
+    {
+      navigate('/search/'+searchText)
+    }
+    else return
+  }
+
   return (
     <div className="homeBodyBox">
       <div className="inputBox">
         <img src={logoText} alt="" />
         <Space.Compact style={{ marginBottom: 20 }}>
-          <Input style={{ height: 50, width: 300 }} placeholder="搜索关键词" />
+          <Input value={searchText} onChange={(e)=>setSearchText(e.target.value)} onKeyUp={(e)=>toSearch(e)} style={{ height: 50, width: 300 }} placeholder="搜索关键词" />
           <Button
             style={{ height: 50, width: 100 }}
             icon={<SearchOutlined />}
             type="primary"
+            onClick={toSearch}
             danger
           >
             搜索
@@ -53,6 +66,8 @@ export default function Body() {
           <div className="affixBox">
             <Space.Compact style={{ marginTop: 20, marginBottom: 20 }}>
               <Input
+              value={searchText} onChange={(e)=>setSearchText(e.target.value)}
+                onKeyUp={(e)=>toSearch(e)}
                 style={{ height: 40, width: 400 }}
                 placeholder="搜索关键词"
               />

@@ -1,4 +1,5 @@
 import "./css/header.scss";
+// import styles from './index.module.scss'
 
 import logoUrl from "../../../assets/image/logo.png";
 import avatar from "../../../assets/image/avatar.jpg";
@@ -16,6 +17,23 @@ import { useNavigate } from "react-router-dom";
 import { FileAddOutlined } from "@ant-design/icons";
 
 export default function Header() {
+
+  const toProfile=()=>{
+    navigate('/profile')
+  }
+
+  const toLogin=()=>{
+    navigate('/login')
+  }
+
+  const toContent=()=>{
+    navigate('/content')
+  }
+
+  const toMessage=()=>{
+    navigate('/message/1')
+  }
+
   const items: MenuProps["items"] = [
     {
       key: "0",
@@ -83,19 +101,25 @@ export default function Header() {
     {
       key: "2",
       danger: true,
-      label: "个人中心",
+      label: (
+        <span onClick={toProfile}>个人中心</span>
+      ),
       icon: <UserOutlined />,
     },
     {
       key: "3",
       danger: true,
-      label: "内容管理",
+      label: (
+        <span onClick={toContent}>内容管理</span>
+      ),
       icon: <EditOutlined />,
     },
     {
       key: "3",
       danger: true,
-      label: "退出登录",
+      label: (
+        <span onClick={toLogin}>退出登录</span>
+      ),
       icon: <LogoutOutlined />,
     },
   ];
@@ -111,7 +135,7 @@ export default function Header() {
   }
 
   return (
-    <div className="headerBox">
+    <div className="homeHeaderBox">
       <div className="left">
         <div className="logo">
           <img onClick={toHome} src={logoUrl} alt="" />
@@ -129,6 +153,7 @@ export default function Header() {
         </Dropdown>
         <Badge count={2} showZero>
           <Button
+            onClick={toMessage}
             danger
             style={{
               marginLeft: 20,

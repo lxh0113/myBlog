@@ -1,13 +1,12 @@
-import "./css/blog.scss";
-import Artictle from "./article";
-
+import "./index.scss";
 import { Tabs } from "antd";
 import type { TabsProps } from "antd";
 
 import url from '../../../assets/slider/1.gif'
-// import { useNavigate } from "react-router-dom";
 
-export default function Body() {
+import Artictle from "../../home/components/article";
+
+export default function Articles() {
   const onChange = (key: string) => {
     console.log(key);
   };
@@ -52,36 +51,46 @@ export default function Body() {
       collect: 10,
       date:'2024.07.24'
     },
-  ];  
+  ]; 
 
   const items: TabsProps["items"] = [
     {
       key: "1",
-      label: "推荐",
+      label: "所有文章",
       children: articleList.map((item) => {
         return <Artictle key={item.id} article={item}></Artictle>;
       }),
     },
     {
       key: "2",
-      label: "关注",
+      label: "草稿",
       children: "Content of Tab Pane 2",
     },
     {
       key: "3",
-      label: "最新",
+      label: "待审核",
       children: "Content of Tab Pane 3",
     },
     {
       key: "4",
-      label: "最热",
+      label: "关注",
+      children: "Content of Tab Pane 3",
+    },
+    {
+      key: "5",
+      label: "粉丝",
+      children: "Content of Tab Pane 3",
+    },
+    {
+      key: "6",
+      label: "收藏",
       children: "Content of Tab Pane 3",
     },
   ];
 
   return (
-    <div className="homeBlogBox">
-      <Tabs defaultActiveKey="1" items={items} onChange={onChange} />
+    <div className="myContentArticleBox">
+      <Tabs size={'large'} defaultActiveKey="1" items={items} onChange={onChange} />
     </div>
   );
 }

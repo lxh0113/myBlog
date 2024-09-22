@@ -1,5 +1,5 @@
 
-.articleBox{
+.homeArticleBox{
     display: flex;
     width: 100%;
     border-bottom: 1px solid #f0f0f0;
@@ -8,7 +8,7 @@
     padding: 10px;
     box-sizing: border-box;
 
-    .left{
+    > .left{
         img{
             width: 300px;
             height: 200px;
@@ -16,12 +16,12 @@
         }
     }
 
-    .right{
+    > .right{
         flex:1;
         margin-left: 20px;
         // background-color: pink;
 
-        .articleTitle{
+        > .articleTitle{
             height: 50px;
             padding: 10px;
             line-height: 50px;
@@ -30,7 +30,7 @@
             font-size: 20px;
         }
 
-        .articleContent{
+        > .articleContent{
             height: 120px;
             padding: 10px;
             box-sizing: border-box;
@@ -38,7 +38,7 @@
 
         }
 
-        .bottom{
+        > .bottom{
             display: flex;
 
             span{

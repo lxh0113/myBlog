@@ -1,0 +1,48 @@
+.searchUserBox {
+  display: flex;
+  justify-content: space-between;
+//   background-color: pink;
+  padding: 20px;
+  box-sizing: border-box;
+  
+  border-bottom: 1px solid #f5f6f7;
+
+  > .left {
+    margin-left: 30px;
+
+    img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      -webkit-border-radius: 50%;
+      -moz-border-radius: 50%;
+      -ms-border-radius: 50%;
+      -o-border-radius: 50%;
+    }
+  }
+
+  > .mid {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-left: 20px;
+
+    h3{
+        line-height: 30px;
+    }
+
+    .spans{
+        line-height: 30px;
+
+        span{
+            margin-right: 20px;
+        }
+    }
+  }
+
+  > .right {
+    display: flex;
+    align-items: center;
+    margin-right: 30px;
+  }
+}

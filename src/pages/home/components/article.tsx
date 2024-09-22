@@ -22,19 +22,19 @@ export default function Artictle(props: any) {
   }
 
   return (
-    <div className="articleBox" onClick={()=>toArticle(props.article.id)}>
+    <div className="homeArticleBox" onClick={()=>toArticle(props.article.id)}>
       <div className="left">
         <img src={props.article.url} alt="" />
       </div>
       <div className="right">
         <p className="articleTitle">{props.article.title}</p>
-        <p className="articleContent">
+        <div className="articleContent">
           <Paragraph ellipsis={{
             rows:4
           }} >
           {props.article.content}
           </Paragraph>
-        </p>
+        </div>
         <div className="bottom">
           {props.article.kind === "原创" ? (
             <Tag color="red">{props.article.kind}</Tag>

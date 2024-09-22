@@ -1,0 +1,65 @@
+.myContentUserInfoBox {
+  width: 100%;
+  margin: 0 auto;
+  margin-top: 240px;
+  background-color: white;
+  max-width: 1200px;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+
+  > .left {
+    img {
+      width: 120px;
+      height: 120px;
+      transform: translateY(-40px);
+      border-radius: 50%;
+      -webkit-border-radius: 50%;
+      -moz-border-radius: 50%;
+      -ms-border-radius: 50%;
+      -o-border-radius: 50%;
+      -webkit-transform: translateY(-40px);
+      -moz-transform: translateY(-40px);
+      -ms-transform: translateY(-40px);
+      -o-transform: translateY(-40px);
+    }
+  }
+
+  > .mid {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin-left: 40px;
+
+    .name {
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .details {
+      flex: 1;
+      margin-top: 30px;
+
+      > .bigBox {
+        font-weight: bold;
+        font-size: 20px;
+        color: #f00;
+        margin-right: 20px;
+
+        span {
+          margin-left: 10px;
+          font-weight: normal;
+          font-size: 14px;
+          color: black;
+        }
+      }
+    }
+  }
+}

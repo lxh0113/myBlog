@@ -1,12 +1,11 @@
 import "./index.scss";
 
-import Header from "../home/components/header";
-// import "../home/components/css/"
-import Content from "./components/content";
-
 import { ConfigProvider } from "antd";
+import Header from "../home/components/header";
+import UserInfo from "./userInfo";
+import Articles from './articles'
 
-export default function Article() {
+export default function Content() {
   return (
     <ConfigProvider
       theme={{
@@ -14,16 +13,16 @@ export default function Article() {
           // Seed Token，影响范围大
           colorPrimary: "#ff4d4f",
           borderRadius: 4,
-
           // 派生变量，影响范围小
           colorBgContainer: "#fff",
         },
       }}
     >
-      <div className="articleBox">
-        <Header></Header>
-        <Content></Content>
-      </div>
+        <div className="myContentHomeBox">
+            <Header></Header>
+            <UserInfo></UserInfo>
+            <Articles></Articles>
+        </div>
     </ConfigProvider>
   );
 }

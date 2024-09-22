@@ -6,6 +6,8 @@ import "./index.scss";
 import { loginAPI } from "../../apis/user";
 import { useNavigate } from "react-router-dom";
 
+import {  ConfigProvider } from "antd";
+
 export default function Login() {
   type FieldType = {
     username?: number;
@@ -40,7 +42,19 @@ export default function Login() {
   }
 
   return (
-    <div className="body">
+
+    <ConfigProvider
+      theme={{
+        token: {
+          // Seed Token，影响范围大
+          colorPrimary: "#ff4d4f",
+          borderRadius: 4,
+          // 派生变量，影响范围小
+          colorBgContainer: "#fff",
+        },
+      }}
+    >
+       <div className="body">
       <div className="loginBox">
         <h1>登录</h1>
         <p>请先登录以便进行操作</p>
@@ -100,5 +114,8 @@ export default function Login() {
         </div>
       </div>
     </div>
+    </ConfigProvider>
+
+   
   );
 }

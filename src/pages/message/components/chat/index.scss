@@ -1,0 +1,18 @@
+
+.myMessageChatBox{
+    width: 100%;
+    display: flex;
+    // padding: 20px;
+    box-sizing: border-box;
+    height: 600px;
+
+    > .left{
+        width: 240px;
+        background-color: pink;
+    }
+
+    > .right{
+        flex:1;
+        background-color: aquamarine;
+    }
+}

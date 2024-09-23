@@ -20,21 +20,21 @@ export default function searchContent() {
     {
       id: 1,
       userId: 2,
-      url: url,
+      url:url,
       title: "你好",
-      content:
-        "Ant Design, a design language for background applications, is refined by Ant UED Team. Ant Design, a design language for background applications, is refined by Ant UED Team. AntDesign, a design language for background applications, is refined by Ant UED Team. AntDesign, a design language for background applications, is refined by Ant UED Team. AntDesign, a design language for background applications, is refined by Ant UED Team. AntDesign, a design language for background applications, is refined by Ant UED Team.",
+      content: "Ant Design, a design language for background applications, is refined by Ant UED Team. Ant Design, a design language for background applications, is refined by Ant UED Team. AntDesign, a design language for background applications, is refined by Ant UED Team. AntDesign, a design language for background applications, is refined by Ant UED Team. AntDesign, a design language for background applications, is refined by Ant UED Team. AntDesign, a design language for background applications, is refined by Ant UED Team.",
       kind: "原创",
       browse: 12,
       love: 120,
       comment: 0,
       collect: 10,
-      date: "2024.07.24",
+      status:0,
+      date:'2024.07.24'
     },
     {
       id: 2,
       userId: 2,
-      url: url,
+      url:url,
       title: "你好",
       content: "111",
       kind: "转载",
@@ -42,12 +42,13 @@ export default function searchContent() {
       love: 120,
       comment: 0,
       collect: 10,
-      date: "2024.07.24",
+      status:1,
+      date:'2024.07.24'
     },
     {
       id: 3,
       userId: 2,
-      url: url,
+      url:url,
       title: "你好",
       content: "111",
       kind: "翻译",
@@ -55,9 +56,10 @@ export default function searchContent() {
       love: 120,
       comment: 0,
       collect: 10,
-      date: "2024.07.24",
+      status:2,
+      date:'2024.07.24'
     },
-  ];
+  ]; 
 
   const userList = [
     {

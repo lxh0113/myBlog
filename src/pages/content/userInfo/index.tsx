@@ -4,8 +4,16 @@ import avatarUrl from "../../../assets/image/avatar.jpg";
 import { Button, Space } from "antd";
 
 import { EditOutlined, SettingOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 export default function UserInfo() {
+
+    const navigate=useNavigate()
+
+    const toProfile=()=>{
+        navigate('/profile')
+    }
+
   return (
     <div className="myContentUserInfoBox">
       <div className="left">
@@ -34,7 +42,7 @@ export default function UserInfo() {
       </div>
       <div className="right">
         <Space>
-          <Button shape="round" icon={<EditOutlined />}>编辑资料</Button>
+          <Button shape="round" onClick={toProfile} icon={<EditOutlined />}>编辑资料</Button>
           <Button shape="round" icon={<SettingOutlined />}>设置</Button>
         </Space>
       </div>

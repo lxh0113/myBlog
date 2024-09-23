@@ -24,6 +24,7 @@ export default function Body() {
       love: 120,
       comment: 0,
       collect: 10,
+      status:0,
       date:'2024.07.24'
     },
     {
@@ -37,6 +38,7 @@ export default function Body() {
       love: 120,
       comment: 0,
       collect: 10,
+      status:1,
       date:'2024.07.24'
     },
     {
@@ -50,6 +52,7 @@ export default function Body() {
       love: 120,
       comment: 0,
       collect: 10,
+      status:2,
       date:'2024.07.24'
     },
   ];  

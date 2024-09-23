@@ -32,6 +32,14 @@ const router = createBrowserRouter([
     )
   },
   {
+    path:'edit/:id',
+    element:(
+      <Suspense fallback={'加载中……'}>
+        <Edit></Edit>
+      </Suspense>
+    )
+  },
+  {
     path:'article/:id',
     element:(
       <Suspense fallback={'加载中……'}>

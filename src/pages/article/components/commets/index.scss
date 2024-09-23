@@ -1,0 +1,27 @@
+.myArticleComments {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+
+  .sendMessageBox {
+    position: fixed;
+    height: 120px;
+    width: 320px;
+    // background-color: red;
+    z-index: 100;
+
+    // margin-bottom: 100px;
+
+    .textarea {
+      height: 120px;
+      width: 320px;
+    }
+
+    .button{
+        position: absolute;
+        bottom: 0;
+        right: 16px;
+        bottom: 16px;
+    }
+  }
+}

@@ -1,8 +1,12 @@
 import "./index.scss";
+import { useState } from "react";
 
 import { Tag } from "antd";
+import { Drawer } from "antd";
+import Comments from "../commets";
 
 import avatarUrl from "../../../../assets/image/avatar.jpg";
+import ColumnContent from "../columnContent";
 
 import {
   FieldTimeOutlined,
@@ -10,12 +14,31 @@ import {
   StarOutlined,
   LikeOutlined,
   MessageOutlined,
-  UnorderedListOutlined
+  UnorderedListOutlined,
 } from "@ant-design/icons";
 
 import { Button } from "antd";
 
 export default function Content() {
+  const [open, setOpen] = useState(false);
+  const [openColumn, setOpenColumn] = useState(false);
+
+  const showDrawer = () => {
+    setOpen(true);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+  };
+
+  const showColumnDrawer = () => {
+    setOpenColumn(true);
+  };
+
+  const onColumnClose = () => {
+    setOpenColumn(false);
+  };
+
   return (
     <div className="myArticleContentBox">
       <div className="title">你好</div>
@@ -81,15 +104,29 @@ export default function Content() {
             <StarOutlined />
             <span>0</span>
           </span>
-          <span>
+          <span onClick={showDrawer}>
             <MessageOutlined />
             <span>0</span>
           </span>
-          <Button shape="round" size="large" icon={<UnorderedListOutlined />}>
+          <Button onClick={showColumnDrawer} shape="round" size="large" icon={<UnorderedListOutlined />}>
             专栏目录
           </Button>
         </div>
       </div>
+
+      <Drawer title="评论区，请友善发言" onClose={onClose} open={open}>
+        <Comments></Comments>
+      </Drawer>
+
+      <Drawer
+        title="专栏目录"
+        placement={"left"}
+        width={500}
+        onClose={onColumnClose}
+        open={openColumn}
+      >
+        <ColumnContent></ColumnContent>
+      </Drawer>
     </div>
   );
 }

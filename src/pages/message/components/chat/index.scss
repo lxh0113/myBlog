@@ -1,18 +1,127 @@
+.myMessageChatBox {
+  width: 100%;
+  display: flex;
+  // padding: 20px;
+  box-sizing: border-box;
+  height: 600px;
 
-.myMessageChatBox{
-    width: 100%;
-    display: flex;
-    // padding: 20px;
-    box-sizing: border-box;
-    height: 600px;
+  > .left {
+    width: 240px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    // background-color: pink;
 
-    > .left{
-        width: 240px;
-        background-color: pink;
+    > .myFriendListBox {
+      display: flex;
+      padding: 10px;
+      border-bottom: 1px solid #f5f6f7;
+
+      &:hover {
+        background-color: #f5f6f7;
+      }
+
+      .img {
+        margin-right: 10px;
+      }
+
+      > .details {
+        display: flex;
+        flex-direction: column;
+
+        .name {
+          font-weight: bold;
+          line-height: 30px;
+        }
+
+        .message {
+          flex: 1;
+          display: flex;
+          align-items: flex-end;
+          max-width: 150px;
+        }
+      }
+
+      img {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        -webkit-border-radius: 50%;
+        -moz-border-radius: 50%;
+        -ms-border-radius: 50%;
+        -o-border-radius: 50%;
+      }
     }
+  }
 
-    > .right{
-        flex:1;
-        background-color: aquamarine;
+  > .right {
+    flex: 1;
+    // background-color: aquamarine;
+
+    .users {
+      display: flex;
+      flex-direction: column;
+      // align-items: center;
+
+      .name {
+        display: flex;
+        justify-content: center;
+        margin: 10px 0;
+        font-weight: bold;
+        border-bottom: 1px solid #f5f6f7;
+      }
+
+      .content {
+        height: 440px;
+        overflow-y: scroll;
+        overflow-x: hidden;
+
+        img {
+          width: 50px;
+          height: 50px;
+          margin: 0 10px;
+          border-radius: 50%;
+          -webkit-border-radius: 50%;
+          -moz-border-radius: 50%;
+          -ms-border-radius: 50%;
+          -o-border-radius: 50%;
+        }
+
+        .messageContent {
+          background-color: #f5f6f7;
+          padding: 15px;
+          border-radius: 10px;
+          -webkit-border-radius: 10px;
+          -moz-border-radius: 10px;
+          -ms-border-radius: 10px;
+          -o-border-radius: 10px;
+          max-width: 400px;
+          white-space: wrap;
+          word-wrap: break-word; /* 允许在单词内换行 */
+          overflow-wrap: break-word; /* 同上，更现代的属性 */
+        }
+
+        .myMessage {
+          display: flex;
+          justify-content: right;
+          align-items: center;
+          margin-bottom: 20px;
+
+          .messageContent {
+            background-color: #ffc8c8;
+          }
+        }
+
+        .otherMessage {
+          display: flex;
+          justify-content: left;
+          align-items: center;
+          margin-bottom: 20px;
+        }
+      }
+
+      .textarea {
+        position: relative;
+      }
     }
+  }
 }

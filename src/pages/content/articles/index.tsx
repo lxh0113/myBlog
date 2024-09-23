@@ -8,6 +8,7 @@ import avatarUrl from "../../../assets/image/avatar.jpg";
 import Artictle from "../../home/components/article";
 import User from "../../search/components/user";
 import Collect from "../collect";
+import Column from "../column";
 
 export default function Articles() {
   const onChange = (key: string) => {
@@ -111,6 +112,24 @@ export default function Articles() {
     },
   ];
 
+  const columnsList = [
+    {
+      id: 1,
+      name: "12",
+      userId: 2,
+    },
+    {
+      id: 2,
+      name: "fff",
+      userId: 2,
+    },
+    {
+      id: 3,
+      name: "vv",
+      userId: 2,
+    },
+  ];
+
   const items: TabsProps["items"] = [
     {
       key: "1",
@@ -154,6 +173,13 @@ export default function Articles() {
         return <Collect key={item.id} collect={item}></Collect>;
       }),
     },
+    {
+      key: "7",
+      label: "专栏",
+      children: columnsList.map((item) => {
+        return <Column key={item.id} column={item}></Column>;
+      }),
+    }
   ];
 
   return (

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Affix, Button, Space, Input } from "antd";
 import { Carousel } from "antd";
 
-import { LockFilled, SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined } from "@ant-design/icons";
 
 import "./css/body.scss";
 import logoText from "../../../assets/image/logoText.png";

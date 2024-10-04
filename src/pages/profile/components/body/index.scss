@@ -32,10 +32,12 @@
 
       &:hover{
         background-color: #f5f6f7;
+        cursor: pointer;
       }
 
       h3 {
         font-size: 20px;
+        margin-bottom: 20px;
       }
 
       > div {

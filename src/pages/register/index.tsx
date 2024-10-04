@@ -1,12 +1,13 @@
 import "./index.scss";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import type { FormProps } from "antd";
 import { Button, Form, Input, message, Space } from "antd";
 import { getCaptchaAPI, registerAPI } from "../../apis/user";
 import { useNavigate } from "react-router-dom";
 
 import {  ConfigProvider } from "antd";
+import useUserStore from "../../stores/user";
 
 export default function Register() {
   type FieldType = {
@@ -23,6 +24,7 @@ export default function Register() {
 
   const navigate = useNavigate();
   const [captchaText, setCaptchaText] = useState("获取验证码");
+  const setUserInfo=useUserStore((state:any)=>state.setUserInfo)
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
     console.log("Success:", values);
@@ -36,9 +38,11 @@ export default function Register() {
     if (res.data.code === 200) {
       message.success("注册成功");
 
+      setUserInfo(res.data.data)
       setTimeout(() => {
         navigate("/");
       }, 2000);
+      
     } else message.error(res.data.msg);
   };
 

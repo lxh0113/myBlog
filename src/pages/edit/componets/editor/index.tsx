@@ -7,7 +7,7 @@ import { IDomEditor, IEditorConfig, IToolbarConfig } from "@wangeditor/editor";
 import { Input } from "antd";
 import "./index.scss";
 
-function MyEditor() {
+function MyEditor(props:any) {
   // editor 实例
   const [editor, setEditor] = useState<IDomEditor | null>(null); // TS 语法
 
@@ -39,6 +39,7 @@ function MyEditor() {
     };
   }, [editor]);
 
+
   return (
     <>
       <div
@@ -60,14 +61,16 @@ function MyEditor() {
             style={{zIndex:2}}
             placeholder="请键入标题，不超过十个字"
             className="editorTitle"
+            value={props.title}
+            onChange={(e)=>props.changeTitle(e.target.value)}
           ></Input>
         </div>
         <Editor
           className="myEditor"
           defaultConfig={editorConfig}
-          value={html}
+          value={props.content}
           onCreated={setEditor}
-          onChange={(editor) => setHtml(editor.getHtml())}
+          onChange={editor => props.changeContent(editor.getHtml())}
           mode="default"
           style={{ height: "800px", overflowY: "hidden" }}
         />

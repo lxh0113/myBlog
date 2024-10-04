@@ -1,133 +1,73 @@
 import "./index.scss";
 
-import { Tabs } from "antd";
+import { message, Tabs } from "antd";
 import type { TabsProps } from "antd";
 
 import Article from "../../../home/components/article";
-import url from "../../../../assets/slider/1.gif";
 
-import avatarUrl from "../../../../assets/image/avatar.jpg";
 import User from "../user";
 
 import SearchColumns from "../columns";
+import { useEffect, useState } from "react";
+import { SearchColumn, UserDetails } from "../../../../types";
+import { searchArticleAPI } from "../../../../apis/article";
+import { useParams } from "react-router-dom";
+import useUserStore from "../../../../stores/user";
+import { searchUserAPI } from "../../../../apis/user";
+import { searchColumnAPI } from "../../../../apis/column";
 
 export default function searchContent() {
+  const [key, setKey] = useState("1");
+
   const onChange = (key: string) => {
     console.log(key);
+    setKey(key);
   };
 
-  const articleList = [
-    {
-      id: 1,
-      userId: 2,
-      url:url,
-      title: "你好",
-      content: "Ant Design, a design language for background applications, is refined by Ant UED Team. Ant Design, a design language for background applications, is refined by Ant UED Team. AntDesign, a design language for background applications, is refined by Ant UED Team. AntDesign, a design language for background applications, is refined by Ant UED Team. AntDesign, a design language for background applications, is refined by Ant UED Team. AntDesign, a design language for background applications, is refined by Ant UED Team.",
-      kind: "原创",
-      browse: 12,
-      love: 120,
-      comment: 0,
-      collect: 10,
-      status:0,
-      date:'2024.07.24'
-    },
-    {
-      id: 2,
-      userId: 2,
-      url:url,
-      title: "你好",
-      content: "111",
-      kind: "转载",
-      browse: 12,
-      love: 120,
-      comment: 0,
-      collect: 10,
-      status:1,
-      date:'2024.07.24'
-    },
-    {
-      id: 3,
-      userId: 2,
-      url:url,
-      title: "你好",
-      content: "111",
-      kind: "翻译",
-      browse: 12,
-      love: 120,
-      comment: 0,
-      collect: 10,
-      status:2,
-      date:'2024.07.24'
-    },
-  ]; 
+  const [articleList, setArticleList] = useState([]);
 
-  const userList = [
-    {
-      id: 1,
-      avatar: avatarUrl,
-      name: "12",
-      articleNum: 12,
-      fans: 12,
-      follows: 12,
-      isFollow: true,
-      intro: "这个人很懒，什么都没有留下",
-    },
-    {
-      id: 1,
-      avatar: avatarUrl,
-      name: "12",
-      articleNum: 12,
-      fans: 12,
-      follows: 12,
-      isFollow: false,
-      intro: "这个人很懒，什么都没有留下",
-    },
-    {
-      id: 1,
-      avatar: avatarUrl,
-      name: "12",
-      articleNum: 12,
-      fans: 12,
-      follows: 12,
-      isFollow: true,
-      intro: "这个人很懒，什么都没有留下",
-    },
-  ];
+  const [userList, setUserList] = useState<UserDetails[]>([]);
 
-  const columnsList = [
-    {
-      id: 1,
-      user: {
-        id: 1,
-        avatar: avatarUrl,
-        name: "lxh0113",
-      },
-      columnsList: [
-        {
-          name: "12",
-          articles: [
-            { id: 2, title: "22" },
-            { id: 3, title: "ww" },
-            { id: 4, title: "ff" },
-        ],
-        },
-      ],
-    },
-    {
-      id: 2,
-      user: {
-        id: 6,
-        avatar: avatarUrl,
-        name: "lxh0113",
-      },
-      columnsList: [
-        {
-          name: "12",
-          articles: [{ id: 2, title: "震惊" }],
-        },
-      ],
-    },
-  ];
+  const [columnsList, setColumnList] = useState<SearchColumn[]>([]);
+
+  const param = useParams();
+  const user = useUserStore((state: any) => state.user);
+
+  useEffect(() => {
+    console.log(param);
+    if (key === "1") {
+      // 这个是文章
+      const getArticle = async () => {
+        const res = await searchArticleAPI(param.word!, user.id);
+
+        if (res.data.code === 200) {
+          setArticleList(res.data.data);
+        } else message.error(res.data.msg);
+      };
+
+      getArticle();
+    } else if (key === "2") {
+      const getUser = async () => {
+        const res = await searchUserAPI(param.word!, user.id);
+
+        if (res.data.code === 200) {
+          setUserList(res.data.data);
+        } else message.error(res.data.msg);
+      };
+
+      getUser();
+    } else if (key === "3") {
+      const getColumn = async () => {
+        const res = await searchColumnAPI(param.word!);
+
+        if (res.data.code === 200) {
+          setColumnList(res.data.data)
+        } else message.error(res.data.msg);
+      };
+
+      getColumn();
+    }
+  }, [key, param.word]);
 
   const items: TabsProps["items"] = [
     {
@@ -148,7 +88,7 @@ export default function searchContent() {
       key: "3",
       label: "专栏",
       children: columnsList.map((item) => {
-        return <SearchColumns key={item.id} column={item}></SearchColumns>;
+        return <SearchColumns key={item.column?.id} column={item}></SearchColumns>;
       }),
     },
   ];

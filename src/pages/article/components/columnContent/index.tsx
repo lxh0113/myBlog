@@ -1,29 +1,31 @@
 import "./index.scss";
-import Column from "../../../content/column";
+import ColumnArticle from "../../../content/column";
+import { useEffect, useState } from "react";
+import { getAllColumnsAPI } from "../../../../apis/column";
+import { message } from "antd";
+import { Column } from "../../../../types";
 
-export default function ColumnContent() {
-  const columnsList = [
-    {
-      id: 1,
-      name: "12",
-      userId: 2,
-    },
-    {
-      id: 2,
-      name: "fff",
-      userId: 2,
-    },
-    {
-      id: 3,
-      name: "vv",
-      userId: 2,
-    },
-  ];
+export default function ColumnContent(props:{
+  id:number|null
+}) {
+  const [columnsList,setColumnList] = useState<Column[]>([])
+
+  useEffect(()=>{
+    const getColumns=async()=>{
+      const res = await getAllColumnsAPI(props.id!);
+      if(res.data.code===200){
+        setColumnList(res.data.data)
+      }
+      else message.error(res.data.msg)
+    }
+
+    getColumns()
+  },[props.id])
 
   return (
     <div className="myArticleContentColumnBox">
       {columnsList.map((item) => {
-        return <Column key={item.id} column={item}></Column>;
+        return <ColumnArticle key={item.id} column={item}></ColumnArticle>;
       })}
     </div>
   );

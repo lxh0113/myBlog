@@ -17,56 +17,63 @@ export default function Artictle(props: any) {
   const navigate = useNavigate();
 
   const toArticle = (id: number) => {
-
-    if(props.article.status<=1) return 
+    if (props.article.article.status <= 1) return;
 
     navigate("/article/" + id);
   };
 
-  const toEdit=(id:number)=>{
-    navigate('/edit/'+id)
-  }
+  const toEdit = (id: number, e: any) => {
+    e.stopPropagation();
+    navigate("/edit/" + id);
+  };
 
   return (
-    <div className="homeArticleBox" onClick={() => toArticle(props.article.id)}>
+    <div
+      className="homeArticleBox"
+      onClick={() => toArticle(props.article.article.id)}
+    >
       <div className="left">
-        <img src={props.article.url} alt="" />
+        <img src={props.article.article.url} alt="" />
       </div>
       <div className="right">
-        <p className="articleTitle">{props.article.title}</p>
+        <p className="articleTitle">{props.article.article.title}</p>
         <div className="articleContent">
           <Paragraph
             ellipsis={{
               rows: 4,
             }}
           >
-            {props.article.content}
+            {props.article.article.brief}
           </Paragraph>
         </div>
-        {props.article.status === 0 && (
+        {props.article.article.status === 0 && (
           <div className="bottom">
             <Tag>草稿</Tag>
-            <span onClick={()=>toEdit(props.article.id)}>
+            <span onClick={(e) => toEdit(props.article.article.id,e)}>
               <EditOutlined />
               <span>编辑</span>
             </span>
           </div>
         )}
-        {props.article.status === 1 && (
+        {props.article.article.status === 1 && (
           <div className="bottom">
             <Tag color="cyan">待审核</Tag>
+            <span onClick={(e) => toEdit(props.article.article.id, e)}>
+              <EditOutlined />
+              <span>编辑</span>
+            </span>
           </div>
         )}
-        {props.article.status === 2 && (
+        {props.article.article.status === 2 && (
           <div className="bottom">
-            {props.article.kind === "原创" ? (
-              <Tag color="red">{props.article.kind}</Tag>
-            ) : props.article.kind === "转载" ? (
-              <Tag color="green">{props.article.kind}</Tag>
+            {props.article.article.kind === "原创" ? (
+              <Tag color="red">{props.article.article.kind}</Tag>
+            ) : props.article.article.kind === "转载" ? (
+              <Tag color="green">{props.article.article.kind}</Tag>
             ) : (
-              <Tag color="purple">{props.article.kind}</Tag>
+              <Tag color="purple">{props.article.article.kind}</Tag>
             )}
-            <span>发布博客 {props.article.date}</span>
+            <span>发布博客 {props.article.article.date}</span>
             <span>
               <EyeOutlined />
               <span>{props.article.browse}</span>
@@ -77,7 +84,7 @@ export default function Artictle(props: any) {
             </span>
             <span>
               <CommentOutlined />
-              <span>{props.article.comment}</span>
+              <span>{props.article.comments}</span>
             </span>
             <span>
               <StarOutlined />

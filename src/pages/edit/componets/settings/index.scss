@@ -14,9 +14,23 @@
   -o-border-radius: 10px;
 
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+
+  .operation {
+    display: flex;
+
+    .icons {
+      display: none;
+    }
+
+    &:hover .icons {
+      display: block;
+    }
+  }
 }
 
-:where(.css-dev-only-do-not-override-i8wtzv).ant-upload-wrapper.ant-upload-picture-card-wrapper
+:where(
+    .css-dev-only-do-not-override-i8wtzv
+  ).ant-upload-wrapper.ant-upload-picture-card-wrapper
   .ant-upload.ant-upload-select,
 :where(
     .css-dev-only-do-not-override-i8wtzv

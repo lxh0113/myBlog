@@ -1,8 +1,6 @@
 import "./css/header.scss";
-// import styles from './index.module.scss'
 
 import logoUrl from "../../../assets/image/logo.png";
-import avatar from "../../../assets/image/avatar.jpg";
 
 import {
   DownOutlined,
@@ -11,10 +9,13 @@ import {
   LogoutOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Dropdown, Space, Button,Badge } from "antd";
+import { Dropdown, Space, Button,Badge, message } from "antd";
 import { useNavigate } from "react-router-dom";
 
 import { FileAddOutlined } from "@ant-design/icons";
+import useUserStore from "../../../stores/user";
+import { useEffect, useState } from "react";
+import { getUserDetailsAPI } from "../../../apis/user";
 
 export default function Header() {
 
@@ -34,6 +35,40 @@ export default function Header() {
     navigate('/message/1')
   }
 
+  const user=useUserStore((state:any)=>state.user)
+
+  const navigate = useNavigate();
+
+  const toHome = () => {
+    navigate("/");
+  };
+
+  const toEdit=()=>{
+    navigate('/edit')
+  }
+
+  const [userInfo,setUserInfo]=useState({
+    articles:0,
+    love:0,
+    follow:0,
+    fans:0,
+    isFollow:false
+  })
+
+  useEffect(()=>{
+    const getUserInfo=async()=>{
+      const res = await getUserDetailsAPI(user.id);
+
+      if(res.data.code===200)
+      {
+        setUserInfo(res.data.data)
+      }
+      else message.error(res.data.msg)
+    }
+
+    getUserInfo()
+  },[])
+
   const items: MenuProps["items"] = [
     {
       key: "0",
@@ -46,7 +81,7 @@ export default function Header() {
             height: 60,
           }}
         >
-          <span>lxh0113</span>
+          <span>{user.username}</span>
         </div>
       ),
     },
@@ -70,7 +105,7 @@ export default function Header() {
               flex: 1,
             }}
           >
-            <span style={{ fontSize: 20, fontWeight: "bold" }}>173</span>
+            <span style={{ fontSize: 20, fontWeight: "bold" }}>{userInfo.fans}</span>
             <span style={{ color: "gray" }}>粉丝</span>
           </div>
           <div
@@ -81,7 +116,7 @@ export default function Header() {
               flex: 1,
             }}
           >
-            <span style={{ fontSize: 20, fontWeight: "bold" }}>70</span>
+            <span style={{ fontSize: 20, fontWeight: "bold" }}>{userInfo.follow}</span>
             <span style={{ color: "gray" }}>关注</span>
           </div>
           <div
@@ -92,8 +127,8 @@ export default function Header() {
               flex: 1,
             }}
           >
-            <span style={{ fontSize: 20, fontWeight: "bold" }}>200</span>
-            <span style={{ color: "gray" }}>获赞</span>
+            <span style={{ fontSize: 20, fontWeight: "bold" }}>{userInfo.articles}</span>
+            <span style={{ color: "gray" }}>文章</span>
           </div>
         </div>
       ),
@@ -124,16 +159,6 @@ export default function Header() {
     },
   ];
 
-  const navigate = useNavigate();
-
-  const toHome = () => {
-    navigate("/");
-  };
-
-  const toEdit=()=>{
-    navigate('/edit')
-  }
-
   return (
     <div className="homeHeaderBox">
       <div className="left">
@@ -146,7 +171,7 @@ export default function Header() {
         <Dropdown menu={{ items }}>
           <a onClick={(e) => e.preventDefault()}>
             <Space>
-              <img src={avatar} alt="" />
+              <img src={user.avatar} alt="" />
               <DownOutlined />
             </Space>
           </a>

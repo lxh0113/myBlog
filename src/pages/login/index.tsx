@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 
 import {  ConfigProvider } from "antd";
 
+import useUserStore from "../../stores/user";
+
 export default function Login() {
   type FieldType = {
     username?: number;
@@ -17,6 +19,8 @@ export default function Login() {
 
   const navigate = useNavigate();
 
+  const setUserInfo=useUserStore((state:any)=>state.setUserInfo)
+
   const onFinish: FormProps<FieldType>["onFinish"] =async (values) => {
     console.log("Success:", values);
 
@@ -24,8 +28,12 @@ export default function Login() {
 
       if (res.data.code === 200) {
         message.success("登录成功");
+        
+        setUserInfo(res.data.data)
 
-        navigate("/");
+        setTimeout(()=>{
+          navigate("/");
+        },2000)
       } else {
         message.error(res.data.msg);
       }

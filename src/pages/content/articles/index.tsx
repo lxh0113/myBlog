@@ -1,169 +1,164 @@
 import "./index.scss";
-import { Col, Tabs } from "antd";
+import { message, Tabs } from "antd";
 import type { TabsProps } from "antd";
-
-import url from "../../../assets/slider/1.gif";
-import avatarUrl from "../../../assets/image/avatar.jpg";
 
 import Artictle from "../../home/components/article";
 import User from "../../search/components/user";
 import Collect from "../collect";
 import Column from "../column";
+import { useEffect, useState } from "react";
+import { ArticleInfo, Collection } from "../../../types";
+import {
+  getArticlesByUserIdAPI,
+  getAuditArticleAPI,
+  getDraftArticleAPI,
+} from "../../../apis/article";
+import useUserStore from "../../../stores/user";
+import { getMyFansAPI, getMyFollowsAPI } from "../../../apis/fans";
+import { UserDetails } from "../../../types/index";
+import { getAllColumnsAPI } from "../../../apis/column";
+import { getCollectionByUserIdAPI } from "../../../apis/collection";
 
 export default function Articles() {
+  const [key, setKey] = useState(1);
+
   const onChange = (key: string) => {
     console.log(key);
+    setKey(parseInt(key));
   };
 
-  const articleList = [
-    {
-      id: 1,
-      userId: 2,
-      url: url,
-      title: "你好",
-      content:
-        "Ant Design, a design language for background applications, is refined by Ant UED Team. Ant Design, a design language for background applications, is refined by Ant UED Team. AntDesign, a design language for background applications, is refined by Ant UED Team. AntDesign, a design language for background applications, is refined by Ant UED Team. AntDesign, a design language for background applications, is refined by Ant UED Team. AntDesign, a design language for background applications, is refined by Ant UED Team.",
-      kind: "原创",
-      browse: 12,
-      love: 120,
-      comment: 0,
-      collect: 10,
-      status: 0,
-      date: "2024.07.24",
-    },
-    {
-      id: 2,
-      userId: 2,
-      url: url,
-      title: "你好",
-      content: "111",
-      kind: "转载",
-      browse: 12,
-      love: 120,
-      comment: 0,
-      collect: 10,
-      status: 1,
-      date: "2024.07.24",
-    },
-    {
-      id: 3,
-      userId: 2,
-      url: url,
-      title: "你好",
-      content: "111",
-      kind: "翻译",
-      browse: 12,
-      love: 120,
-      comment: 0,
-      collect: 10,
-      status: 2,
-      date: "2024.07.24",
-    },
-  ];
+  const [articleList, setArticleList] = useState<ArticleInfo[]>([]);
 
-  const userList = [
-    {
-      id: 1,
-      avatar: avatarUrl,
-      name: "12",
-      articleNum: 12,
-      fans: 12,
-      follows: 12,
-      isFollow: true,
-      intro: "这个人很懒，什么都没有留下",
-    },
-    {
-      id: 1,
-      avatar: avatarUrl,
-      name: "12",
-      articleNum: 12,
-      fans: 12,
-      follows: 12,
-      isFollow: false,
-      intro: "这个人很懒，什么都没有留下",
-    },
-    {
-      id: 1,
-      avatar: avatarUrl,
-      name: "12",
-      articleNum: 12,
-      fans: 12,
-      follows: 12,
-      isFollow: true,
-      intro: "这个人很懒，什么都没有留下",
-    },
-  ];
+  const user = useUserStore((state: any) => state.user);
 
-  const collectionList = [
-    {
-      id: 1,
-      name: "1222",
-      userId: 2,
-    },
-    {
-      id: 2,
-      name: "2wq2",
-      userId: 2,
-    },
-    {
-      id: 3,
-      name: "cc",
-      userId: 2,
-    },
-  ];
+  const [userList, setUserList] = useState<UserDetails[]>([]);
 
-  const columnsList = [
-    {
-      id: 1,
-      name: "12",
-      userId: 2,
-    },
-    {
-      id: 2,
-      name: "fff",
-      userId: 2,
-    },
-    {
-      id: 3,
-      name: "vv",
-      userId: 2,
-    },
-  ];
+  const [collectionList,setCollectionList] = useState<Collection[]>([]);
+
+  const [flag,setFlag]=useState(0)
+
+  useEffect(() => {
+    if (key === 1) {
+      // 获取所有文章
+      const getAllArticles = async () => {
+        const res = await getArticlesByUserIdAPI(user.id);
+
+        if (res.data.code === 200) {
+          console.log(res.data.data);
+          setArticleList(res.data.data);
+        }
+      };
+
+      getAllArticles();
+    } else if (key === 2) {
+      // 获取草稿
+      const getDraftArticle = async () => {
+        const res = await getDraftArticleAPI(user.id);
+
+        if (res.data.code === 200) {
+          console.log(res.data.data);
+          setArticleList(res.data.data);
+        }
+      };
+
+      getDraftArticle();
+    } else if (key === 3) {
+      // 待审核
+      const getAuditArticles = async () => {
+        const res = await getAuditArticleAPI(user.id);
+
+        if (res.data.code === 200) {
+          console.log(res.data.data);
+          setArticleList(res.data.data);
+        }
+      };
+
+      getAuditArticles();
+    } else if (key === 4) {
+      // 关注
+      const getMyFollows = async () => {
+        const res = await getMyFollowsAPI(user.id);
+
+        if (res.data.code === 200) {
+          console.log(res.data.data);
+          setUserList(res.data.data);
+        } else message.error(res.data.msg);
+      };
+
+      getMyFollows();
+    } else if (key === 5) {
+      // 粉丝
+      const getMyFans = async () => {
+        const res = await getMyFansAPI(user.id);
+
+        if (res.data.code === 200) {
+          console.log(res.data.data);
+          setUserList(res.data.data);
+        } else message.error(res.data.msg);
+      };
+
+      getMyFans();
+    } else if (key === 6) {
+      // 获取收藏夹以及收藏
+      const getCollection =async () => {
+        const res =await getCollectionByUserIdAPI(user.id);
+
+        if(res.data.code===200){
+          setCollectionList(res.data.data)
+        }
+        else message.error(res.data.msg)
+      };
+
+      getCollection();
+    } else {
+      // 专栏
+      const getColumns = async () => {
+        const res = await getAllColumnsAPI(user.id);
+        if (res.data.code === 200) {
+          setColumnList(res.data.data);
+        } else message.error(res.data.msg);
+      };
+
+      getColumns();
+    }
+  }, [key,flag]);
+
+  const [columnsList, setColumnList] = useState<Collection[]>();
 
   const items: TabsProps["items"] = [
     {
       key: "1",
       label: "所有文章",
       children: articleList.map((item) => {
-        return <Artictle key={item.id} article={item}></Artictle>;
+        return <Artictle key={item.article!.id} article={item}></Artictle>;
       }),
     },
     {
       key: "2",
       label: "草稿",
       children: articleList.map((item) => {
-        return <Artictle key={item.id} article={item}></Artictle>;
+        return <Artictle key={item.article!.id} article={item}></Artictle>;
       }),
     },
     {
       key: "3",
       label: "待审核",
       children: articleList.map((item) => {
-        return <Artictle key={item.id} article={item}></Artictle>;
+        return <Artictle key={item.article!.id} article={item}></Artictle>;
       }),
     },
     {
       key: "4",
       label: "关注",
       children: userList.map((item, index) => {
-        return <User key={index} user={item}></User>;
+        return <User setFlag={()=>setFlag(flag+1)} key={index} user={item}></User>;
       }),
     },
     {
       key: "5",
       label: "粉丝",
       children: userList.map((item, index) => {
-        return <User key={index} user={item}></User>;
+        return <User setFlag={()=>setFlag(flag+1)} key={index} user={item}></User>;
       }),
     },
     {
@@ -176,10 +171,10 @@ export default function Articles() {
     {
       key: "7",
       label: "专栏",
-      children: columnsList.map((item) => {
+      children: columnsList?.map((item) => {
         return <Column key={item.id} column={item}></Column>;
       }),
-    }
+    },
   ];
 
   return (

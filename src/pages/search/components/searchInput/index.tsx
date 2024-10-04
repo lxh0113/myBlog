@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Affix, Button, Space, Input } from "antd";
 
 import { SearchOutlined } from "@ant-design/icons";
@@ -6,6 +6,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import logoText from "../../../../assets/image/logoText.png";
 
 import "./index.scss";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function SearchInput() {
   let [affix, setAffix] = useState(false);
@@ -17,6 +18,19 @@ export default function SearchInput() {
 
   const [searchText, setSearchText] = useState("");
 
+  const navigate=useNavigate()
+  const param=useParams()
+
+  const toDeal=(e:any)=>{
+    if(e.key==="Enter"){
+      navigate("/search/"+searchText)
+    }
+  }
+
+  useEffect(()=>{
+    setSearchText(param.word!)
+  },[])
+
   return (
     <div className="searchInputBox">
       <div className="inputBox">
@@ -24,7 +38,8 @@ export default function SearchInput() {
         <Space.Compact style={{ marginBottom: 20 }}>
           <Input
             value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
+            onChange={(e)=>setSearchText(e.target.value!)}
+            onKeyUp={(e) => toDeal(e)}
             style={{ height: 50, width: 300 }}
             placeholder="搜索关键词"
           />

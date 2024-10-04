@@ -1,14 +1,22 @@
 import "./index.scss";
 
-import { Anchor, Col, Row, Timeline, Button } from "antd";
+import { Anchor, Col, Row, Timeline, Button, InputNumber, message } from "antd";
 import { Form, Input, Radio, Upload, Space } from "antd";
 import type { GetProp, UploadFile, UploadProps } from "antd";
 import ImgCrop from "antd-img-crop";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { FormProps } from "antd";
 
-import avatarUrl from "../../../../assets/image/avatar.jpg";
+import { BrowseGroup, BrowseHistory, User } from "../../../../types";
+import {
+  changeUserInfoAPI,
+  getCaptchaAPI,
+  getUserInfoAPI,
+} from "../../../../apis/user";
+import useUserStore from "../../../../stores/user";
+import { getHistoryAPI } from "../../../../apis/browse";
+import { useNavigate } from "react-router-dom";
 
 export default function Body() {
   const { TextArea } = Input;
@@ -24,8 +32,19 @@ export default function Body() {
     },
   ]);
 
-  const onChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
+  const onChange: UploadProps["onChange"] = ({
+    file,
+    fileList: newFileList,
+  }) => {
     setFileList(newFileList);
+
+    if (file.status === "done") {
+      setUserInfo({
+        ...userInfo,
+        avatar: file.response.data,
+      });
+      message.success("上传成功");
+    }
   };
 
   const onPreview = async (file: UploadFile) => {
@@ -43,21 +62,102 @@ export default function Body() {
     imgWindow?.document.write(image.outerHTML);
   };
 
-  type FieldType = {
-    username?: string;
-    password?: string;
-    remember?: string;
-  };
+  const [userForm] = Form.useForm();
+  const [changePasswordForm] = Form.useForm();
+  const [captcha, setCaptcha] = useState("");
+  const [captchaText, setCaptchaText] = useState("获取验证码");
 
-  const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
+  const [userInfo, setUserInfo] = useState<User>({
+    id: 1,
+    username: "",
+    password: "",
+    age: 0,
+    avatar: "",
+    gender: 1,
+    intro: "",
+    email: "",
+  });
+
+  const onFinish: FormProps<User>["onFinish"] = async (values) => {
     console.log("Success:", values);
+
+    setUserInfo({ ...values });
+
+    const res = await changeUserInfoAPI(userInfo);
+
+    if (res.data.code === 200) {
+      message.success("修改成功");
+      userForm.setFieldsValue(res.data.data);
+    } else message.error(res.data.msg);
   };
 
-  const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
-    errorInfo
-  ) => {
+  const onFinishFailed: FormProps<User>["onFinishFailed"] = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
+
+  let timer: any = null;
+
+  const getCaptcha = async () => {
+    if (captchaText !== "获取验证码") {
+      message.error("已获取过验证码");
+      return;
+    }
+
+    const res = await getCaptchaAPI(userInfo.email!);
+
+    if (res.data.code === 200) {
+      message.success("验证码发送成功");
+
+      let second = 60;
+
+      timer = setInterval(() => {
+        second--;
+        setCaptchaText("还剩" + second + "秒");
+
+        if (second === 0) {
+          clearInterval(timer);
+          setCaptchaText("获取验证码");
+        }
+      }, 1000);
+    } else message.error(res.data.msg);
+  };
+
+  const user = useUserStore((state: any) => state.user);
+
+  useEffect(() => {
+    const getUserInfo = async () => {
+      const res = await getUserInfoAPI(user.id);
+      console.log(res.data.data);
+
+      if (res.data.code === 200) {
+        setUserInfo({ ...res.data.data });
+        fileList[0].url = res.data.data.avatar;
+        userForm.setFieldsValue(res.data.data);
+        changePasswordForm.setFieldsValue(res.data.data);
+      } else message.error(res.data.msg);
+    };
+
+    getUserInfo();
+  }, []);
+
+  const [browseList, setBrowseList] = useState<BrowseGroup[]>([]);
+
+  const navigate=useNavigate()
+  const toArticle=(id:number)=>{
+    navigate("/article/"+id)
+  }
+
+  useEffect(() => {
+    const getBrowse = async () => {
+      const res = await getHistoryAPI(user.id);
+
+      if (res.data.code === 200) {
+        setBrowseList(res.data.data);
+      } else message.error(res.data.msg);
+    };
+
+    getBrowse();
+  }, []);
 
   return (
     <div className="myProfileBodyBox">
@@ -71,16 +171,21 @@ export default function Body() {
               layout="horizontal"
               style={{ maxWidth: 600 }}
               size={"large"}
+              form={userForm}
+              onFinish={onFinish}
+              onFinishFailed={onFinishFailed}
+              initialValues={userInfo}
             >
-              <Form.Item label="用户id">
-                <Input disabled />
+              <Form.Item<User> label="用户id" name={"id"}>
+                <Input disabled value={userInfo.id!} />
               </Form.Item>
-              <Form.Item label="用户头像">
+              <Form.Item<User> label="用户头像">
                 <ImgCrop rotationSlider>
                   <Upload
-                    action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
+                    action="http://localhost:8080/api/upload"
                     listType="picture-card"
                     fileList={fileList}
+                    name="file"
                     onChange={onChange}
                     onPreview={onPreview}
                     maxCount={1}
@@ -89,20 +194,48 @@ export default function Body() {
                   </Upload>
                 </ImgCrop>
               </Form.Item>
-              <Form.Item label="用户昵称">
-                <Input />
+              <Form.Item<User> label="用户昵称" name={"username"}>
+                <Input
+                  value={userInfo.username!}
+                  onChange={(e) =>
+                    setUserInfo({ ...userInfo, username: e.target.value })
+                  }
+                />
               </Form.Item>
-              <Form.Item label="年龄">
-                <Input />
+              <Form.Item<User> label="年龄" name={"age"}>
+                <InputNumber
+                  value={userInfo.age}
+                  min={1}
+                  max={100}
+                  onChange={(value) =>
+                    setUserInfo({ ...userInfo, age: value! })
+                  }
+                />
               </Form.Item>
-              <Form.Item label="性别">
-                <Radio.Group>
+              <Form.Item<User> label="性别" name={"gender"}>
+                <Radio.Group
+                  value={userInfo.gender}
+                  onChange={(e) =>
+                    setUserInfo({ ...userInfo, gender: e.target.value })
+                  }
+                >
                   <Radio value={1}> 男 </Radio>
                   <Radio value={0}> 女 </Radio>
                 </Radio.Group>
               </Form.Item>
-              <Form.Item label="个人简介">
-                <TextArea rows={4} />
+              <Form.Item<User> label="个人简介" name={"intro"}>
+                <TextArea
+                  value={userInfo.intro!}
+                  onChange={(e) =>
+                    setUserInfo({ ...userInfo, intro: e.target.value })
+                  }
+                  rows={4}
+                />
+              </Form.Item>
+              <Form.Item>
+                <Button type={"primary"} htmlType="submit">
+                  修改
+                </Button>
               </Form.Item>
             </Form>
           </div>
@@ -112,29 +245,26 @@ export default function Body() {
           >
             <h2 className="myProfileTitleText">浏览历史</h2>
             <Timeline
-              items={[
-                {
+              items={browseList.map((item: BrowseGroup) => {
+                return {
                   children: (
                     <div className="myBrowseBox">
-                      <h4>今日</h4>
-                      <div className="myBrowseBoxItem">
-                        <h3>scss</h3>
-                        <div>
-                          <img src={avatarUrl} alt="" />
-                          <span>123</span>
-                        </div>
-                      </div>
-                      <div className="myBrowseBoxItem">
-                        <h3>scss</h3>
-                        <div>
-                          <img src={avatarUrl} alt="" />
-                          <span>123</span>
-                        </div>
-                      </div>
+                      <h4>{item.date}</h4>
+                      {item.browseHistory.map((browse: BrowseHistory) => {
+                        return (
+                          <div className="myBrowseBoxItem" onClick={()=>toArticle(browse.article.id)}>
+                            <h3>{browse.article?.title}</h3>
+                            <div>
+                              <img src={browse.user.avatar!} alt="" />
+                              <span>{browse.user.username}</span>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   ),
-                },
-              ]}
+                };
+              })}
             />
           </div>
           <div id="part-3" style={{ marginTop: 40 }}>
@@ -144,32 +274,63 @@ export default function Body() {
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 12 }}
               style={{ maxWidth: 600 }}
-              initialValues={{ remember: true }}
+              initialValues={userInfo}
               onFinish={onFinish}
               onFinishFailed={onFinishFailed}
               autoComplete="off"
+              form={changePasswordForm}
             >
-              <Form.Item<FieldType>
+              <Form.Item
                 label="邮箱"
-                name="username"
+                name="email"
                 rules={[
-                  { required: true, message: "Please input your username!" },
+                  { required: true, message: "Please input your email!" },
                 ]}
               >
-                <Input />
+                <Input
+                  value={userInfo.email!}
+                  onChange={(e) =>
+                    setUserInfo({ ...userInfo, email: e.target.value })
+                  }
+                />
               </Form.Item>
 
-              <Form.Item<FieldType>
-                label="验证码"
+              <Form.Item
+                label="新密码"
                 name="password"
                 rules={[
                   { required: true, message: "Please input your password!" },
                 ]}
               >
+                <Input
+                  value={userInfo.password!}
+                  onChange={(e) =>
+                    setUserInfo({ ...userInfo, password: e.target.value })
+                  }
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="验证码"
+                rules={[
+                  { required: true, message: "Please input your password!" },
+                ]}
+              >
                 <Space>
-                  <Input />
-                  <Button type={"primary"}>获取验证码&nbsp;</Button>
+                  <Input
+                    value={captcha}
+                    onChange={(e) => setCaptcha(e.target.value)}
+                  />
+                  <Button type={"primary"} onClick={getCaptcha}>
+                    {captchaText}&nbsp;
+                  </Button>
                 </Space>
+              </Form.Item>
+
+              <Form.Item>
+                <Button type={"primary"} htmlType="submit">
+                  修改
+                </Button>
               </Form.Item>
             </Form>
           </div>

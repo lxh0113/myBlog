@@ -1,33 +1,28 @@
 import { useNavigate } from "react-router-dom";
 import "./index.scss";
-import { Collapse } from "antd";
+import { Collapse, message } from "antd";
 
 import { FieldTimeOutlined } from "@ant-design/icons";
+import { useEffect, useState } from "react";
+import { Article } from "../../../types";
+import { getCollectByCollectionAPI } from "../../../apis/collect";
+import dayjs from "dayjs";
 
-export default function Collect(props: any) {
-  const text = `
-  A dog is a type of domesticated animal.
-  Known for its loyalty and faithfulness,
-  it can be found as a welcome guest in many households across the world.
-`;
+export default function CollectView(props:any) {
+  const [articleList, setArticleList] = useState<Article[]>([]);
 
-  const articleList = [
-    {
-      id: 1,
-      title: "你好呀",
-      date: "2024/12/4",
-    },
-    {
-      id: 1,
-      title: "你好呀",
-      date: "2024/12/4",
-    },
-    {
-      id: 1,
-      title: "你好呀",
-      date: "2024/12/4",
-    },
-  ];
+  useEffect(() => {
+    const getCollect = async () => {
+      const res = await getCollectByCollectionAPI(props.collect.id);
+
+      if(res.data.code===200){
+        setArticleList(res.data.data)
+      }
+      else message.error(res.data.msg)
+    };
+
+    getCollect();
+  }, []);
 
   const navigate = useNavigate();
 
@@ -46,12 +41,12 @@ export default function Collect(props: any) {
               return (
                 <div
                   key={index}
-                  onClick={() => toArticle(item.id)}
+                  onClick={() => toArticle(item.id!)}
                   className="collectArticlesBox"
                 >
                   <span>
                     <FieldTimeOutlined />
-                    <span>{item.date}</span>
+                    <span>{dayjs(item.date).format("YYYY-MM-DD hh:mm:ss")}</span>
                   </span>
                   <p>{item.title}</p>
                 </div>

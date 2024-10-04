@@ -1,3 +1,4 @@
+import { User } from "../types";
 import http from "../utils/http";
 
 export const loginAPI = (id: number, password: string) => {
@@ -30,6 +31,39 @@ export const registerAPI = (
       email,
       password,
       captcha,
+    },
+  });
+};
+
+export const getUserInfoAPI = (userId: number) => {
+  return http({
+    url: "/user/" + userId,
+    method: "GET",
+  });
+};
+
+export const getUserDetailsAPI = (userId: number) => {
+  return http({
+    url: "/user/info/" + userId,
+    method: "GET",
+  });
+};
+
+export const changeUserInfoAPI = (user: User) => {
+  return http({
+    url: "/user/change",
+    method: "POST",
+    data: user,
+  });
+};
+
+export const searchUserAPI = (searchInput: string, userId: number) => {
+  return http({
+    url: "/user/searchInput",
+    method: "GET",
+    params: {
+      searchInput,
+      userId,
     },
   });
 };

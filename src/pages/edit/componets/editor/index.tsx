@@ -7,7 +7,7 @@ import { IDomEditor, IEditorConfig, IToolbarConfig } from "@wangeditor/editor";
 import { Input } from "antd";
 import "./index.scss";
 
-function MyEditor(props:any) {
+function MyEditor(props: any) {
   // editor 实例
   const [editor, setEditor] = useState<IDomEditor | null>(null); // TS 语法
 
@@ -25,9 +25,21 @@ function MyEditor(props:any) {
   const toolbarConfig: Partial<IToolbarConfig> = {}; // TS 语法
 
   // 编辑器配置
-  const editorConfig: Partial<IEditorConfig> = {
+  let editorConfig: Partial<IEditorConfig> = {
     // TS 语法
     placeholder: "请输入内容...",
+    MENU_CONF: {
+      ["uploadImage"]: {
+        fieldName: "file",
+        server: "http://localhost:8080/api/upload/editor",
+        allowedFileTypes: ["image/*"],
+        onSuccess(file: File, res: any) {  // TS 语法
+          // onSuccess(file, res) {          // JS 语法
+              console.log(`${file.name} 上传成功`, res)
+          },
+      },
+
+    },
   };
 
   // 及时销毁 editor ，重要！
@@ -39,14 +51,13 @@ function MyEditor(props:any) {
     };
   }, [editor]);
 
-
   return (
     <>
       <div
         style={{
           backgroundColor: "#f9f9fa",
           zIndex: 998,
-          marginTop: 90
+          marginTop: 90,
         }}
       >
         <Toolbar
@@ -54,15 +65,14 @@ function MyEditor(props:any) {
           defaultConfig={toolbarConfig}
           mode="default"
           className="myToolbar"
-          style={{border:'1px solid #eee',zIndex:1000}}
+          style={{ border: "1px solid #eee"}}
         />
-        <div className="myEditorTitleInputBox">
+        <div className="myEditorTitleInputBox" style={{ zIndex: 1000 }}>
           <Input
-            style={{zIndex:2}}
             placeholder="请键入标题，不超过十个字"
             className="editorTitle"
             value={props.title}
-            onChange={(e)=>props.changeTitle(e.target.value)}
+            onChange={(e) => props.changeTitle(e.target.value)}
           ></Input>
         </div>
         <Editor
@@ -70,9 +80,9 @@ function MyEditor(props:any) {
           defaultConfig={editorConfig}
           value={props.content}
           onCreated={setEditor}
-          onChange={editor => props.changeContent(editor.getHtml())}
+          onChange={(editor) => props.changeContent(editor.getHtml())}
           mode="default"
-          style={{ height: "800px", overflowY: "hidden" }}
+          style={{ minHeight:800,height: "100%", overflowY: "hidden" }}
         />
       </div>
       {/* <div style={{ marginTop: "15px" }}>{html}</div> */}

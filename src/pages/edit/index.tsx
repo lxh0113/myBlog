@@ -36,6 +36,7 @@ export default function Edit() {
   });
 
   let [content, setContent] = useState("");
+  const [reloadFlag,setReloadFlag]=useState(0)
 
   const [articleLabels, addArticleLabels] = useState([]);
 
@@ -74,7 +75,7 @@ export default function Edit() {
     };
 
     init();
-  }, []);
+  }, [reloadFlag]);
 
   const navigate = useNavigate();
 
@@ -110,6 +111,8 @@ export default function Edit() {
 
       if (response.data.code === 200) {
         message.success("保存成功");
+        navigate('/edit/'+res.data.data.id)
+        setReloadFlag(reloadFlag+1)
       } else message.error(response.data.msg);
     } else message.error("保存失败");
   };

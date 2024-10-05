@@ -73,9 +73,9 @@ export const getFollowArticlesAPI = (userId: number) => {
   });
 };
 
-export const getNewArticlesAPI = (userId:number) => {
+export const getNewArticlesAPI = (userId: number) => {
   return http({
-    url: "/article/new/"+userId,
+    url: "/article/new/" + userId,
     method: "GET",
   });
 };
@@ -87,12 +87,38 @@ export const getHotArticlesAPI = (userId: number) => {
   });
 };
 
-export const searchArticleAPI=(searchInput:string,userId:number)=>{
+export const searchArticleAPI = (searchInput: string, userId: number) => {
   return http({
-    url:"/article/searchInput",
-    method:"GET",
-    params:{
-      searchInput,userId
-    }
-  })
-}
+    url: "/article/searchInput",
+    method: "GET",
+    params: {
+      searchInput,
+      userId,
+    },
+  });
+};
+
+export const adminGetArticlesAPI = (status: number, word: string) => {
+  return http({
+    url: "/article/allArticle",
+    method: "GET",
+    params: {
+      status,
+      word,
+    },
+  });
+};
+
+export const successUploadAPI = (id: number) => {
+  return http({
+    url: "/article/success/" + id,
+    method: "POST",
+  });
+};
+
+export const failUploadAPI = (id: number) => {
+  return http({
+    url: "/article/fail/" + id,
+    method: "POST",
+  });
+};

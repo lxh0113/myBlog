@@ -22,3 +22,10 @@ export const deleteCommentAPI = (id: number) => {
     method: "DELETE",
   });
 };
+
+export const adminGetCommentsAPI = () => {
+  return http({
+    url: "/comments/admin",
+    method: "GET",
+  });
+};

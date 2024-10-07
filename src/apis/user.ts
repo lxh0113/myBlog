@@ -67,3 +67,14 @@ export const searchUserAPI = (searchInput: string, userId: number) => {
     },
   });
 };
+
+export const adminGetUsersAPI = (userId: number, word: string) => {
+  return http({
+    url: "/user/admin",
+    method: "GET",
+    params: {
+      userId,
+      word,
+    },
+  });
+};

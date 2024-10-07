@@ -23,9 +23,13 @@ export const deleteCommentAPI = (id: number) => {
   });
 };
 
-export const adminGetCommentsAPI = () => {
+export const adminGetCommentsAPI = (articleId: number, word: string) => {
   return http({
     url: "/comments/admin",
     method: "GET",
+    params: {
+      articleId,
+      word,
+    },
   });
 };

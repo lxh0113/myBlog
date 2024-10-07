@@ -5,6 +5,7 @@ type Browse = {
   id: number | null;
   userId: number | null;
   articleId: number | null;
+  date: Date | string | null;
 };
 
 type BrowseHistory = {

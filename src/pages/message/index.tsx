@@ -1,13 +1,12 @@
-import "./index.scss"
+import "./index.scss";
 
-import {  ConfigProvider } from "antd";
+import { ConfigProvider } from "antd";
 import Header from "../home/components/header";
 import Content from "./components/content";
 
-export default function Message(){
-
-    return (
-        <ConfigProvider
+export default function Message() {
+  return (
+    <ConfigProvider
       theme={{
         token: {
           // Seed Token，影响范围大
@@ -23,5 +22,5 @@ export default function Message(){
         <Content></Content>
       </div>
     </ConfigProvider>
-    )
+  );
 }

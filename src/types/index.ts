@@ -9,6 +9,7 @@ import type { Love } from "./modules/love";
 import type { Collection, ArticleCollection } from "./modules/collection";
 import type { Collect } from "./modules/collect";
 import type { Browse, BrowseGroup, BrowseHistory } from "./modules/browse";
+import type { Message, MessageCommon,MessageFriend } from "./modules/message";
 
 export {
   User,
@@ -29,4 +30,7 @@ export {
   SearchColumn,
   BrowseGroup,
   BrowseHistory,
+  Message,
+  MessageCommon,
+  MessageFriend,
 };

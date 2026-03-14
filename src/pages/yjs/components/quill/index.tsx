@@ -7,7 +7,7 @@ import { WebsocketProvider } from "y-websocket";
 import * as Yjs from "yjs";
 import { wsUrl } from "@config";
 import { useParams } from "react-router";
-import { Button, Divider, Drawer, Select } from "antd";
+import { Button, Divider, Drawer, Select, Space } from "antd";
 
 import "./index.scss";
 import useUserStore from "../../../../stores/user";
@@ -17,8 +17,6 @@ import {
 } from "../../../../apis/cooperateArticle";
 import type { CooperateArticle } from "../../../../types";
 import dayjs from "dayjs";
-import type { DraggableData, DraggableEvent } from "react-draggable";
-import Draggable from "react-draggable";
 
 // ========== 静态配置 ==========
 const fontSizeStyle = Quill.import("attributors/style/size");
@@ -57,11 +55,12 @@ const toolbarOptions = {
 const Editor: React.FC = () => {
   const container = useRef<HTMLDivElement | null>(null);
   const quillRef = useRef<Quill | null>(null);
-  const quillBindingRef = useRef<QuillBinding | null>(null); // 新增：保存 binding 实例
-  const isContentSetRef = useRef<boolean>(false); // 新增：标记内容是否已设置
+  const quillBindingRef = useRef<QuillBinding | null>(null);
+  const isContentSetRef = useRef<boolean>(false);
 
   const [isSaver, setIsSaver] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [selectedText, setSelectedText] = useState(""); // 新增：选中的文本
 
   const ydocRef = useRef<Yjs.Doc | null>(null);
   const providerRef = useRef<WebsocketProvider | null>(null);
@@ -220,6 +219,26 @@ const Editor: React.FC = () => {
 
     quillRef.current = quill;
 
+    // ========== 新增：监听选中文本变化 ==========
+    quill.on(
+      "selection-change",
+      (range: any, oldRange: any, source: string) => {
+        if (range) {
+          if (range.length > 0) {
+            // 有选中的文本
+            const text = quill.getText(range.index, range.length);
+            setSelectedText(text);
+          } else {
+            // 只是光标位置，没有选中文本
+            setSelectedText("");
+          }
+        } else {
+          // 编辑器失去焦点
+          setSelectedText("");
+        }
+      },
+    );
+
     // 2. 初始化 Yjs
     const doc = new Yjs.Doc();
     ydocRef.current = doc;
@@ -243,7 +262,7 @@ const Editor: React.FC = () => {
       color: userColor,
     });
 
-    // 5. 绑定 Quill 和 Yjs - 但先不自动同步初始内容
+    // 5. 绑定 Quill 和 Yjs
     const quillBinding = new QuillBinding(text, quill, awareness);
     quillBindingRef.current = quillBinding;
 
@@ -269,6 +288,7 @@ const Editor: React.FC = () => {
         console.log("设置初始内容到 Quill");
 
         // 临时移除事件监听，避免触发额外的渲染
+        quill.off("selection-change");
         quill.off("text-change");
 
         // 转换并设置内容
@@ -280,6 +300,14 @@ const Editor: React.FC = () => {
         quill.setContents(tempDelta, "silent");
 
         // 重新添加事件监听
+        quill.on("selection-change", (range: any) => {
+          if (range && range.length > 0) {
+            const text = quill.getText(range.index, range.length);
+            setSelectedText(text);
+          } else {
+            setSelectedText("");
+          }
+        });
         quill.on("text-change", () => {});
 
         isContentSetRef.current = true;
@@ -400,8 +428,11 @@ const Editor: React.FC = () => {
     setOpen(false);
   };
 
+  const [type, setType] = useState("lucy");
+
   const handleChange = (value: string) => {
     console.log(`selected ${value}`);
+    setType(value);
   };
 
   return (
@@ -430,28 +461,34 @@ const Editor: React.FC = () => {
         mask={false}
         open={open}
       >
-        <Select
-          defaultValue="lucy"
-          style={{ width: 120, marginBottom: 20 }}
-          onChange={handleChange}
-          options={[
-            { value: "jack", label: "AI润色" },
-            { value: "lucy", label: "AI翻译" },
-            { value: "Yiminghe", label: "AI扩写" },
-            { value: "lixiaohui", label: "AI纠错" },
-            { value: "lizeyan", label: "AI总结" },
-          ]}
-        />
+        <Space style={{ marginBottom: 20 }}>
+          <Select
+            defaultValue="lucy"
+            style={{
+              width: 120,
+              marginBottom: 0,
+            }}
+            value={type}
+            onChange={handleChange}
+            options={[
+              { value: "jack", label: "AI润色" },
+              { value: "lucy", label: "AI翻译" },
+              { value: "Yiminghe", label: "AI扩写" },
+              { value: "lixiaohui", label: "AI纠错" },
+              { value: "lizeyan", label: "AI总结" },
+            ]}
+          />
+          <Button type="primary">转换</Button>
+        </Space>
+
         <p>当前选择文本</p>
-        {quillRef.current?.getSelection()
-          ? quillRef.current?.getText(
-              quillRef.current.getSelection()?.index,
-              quillRef.current.getSelection()?.length,
-            )
-          : ""}
         <Divider></Divider>
-        <p>转换后结果</p> <div className="converted-content"></div>
-        <Divider></Divider>
+        <div className="selected-text">{selectedText || "未选中任何文本"}</div>
+        <Divider />
+        <p>转换后结果</p>
+        <Divider />
+        <div className="converted-content"></div>
+        <Divider />
         <Button type="primary">替换当前选中内容</Button>
       </Drawer>
     </div>

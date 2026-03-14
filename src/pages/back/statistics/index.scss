@@ -1,0 +1,20 @@
+.bigBox {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 160px);
+
+  .title {
+    font-size: large;
+    color: red;
+  }
+
+  .myChartBox {
+    flex: 1;
+    // height: 100%;
+    margin-top: 20px;
+    // background-color: beige;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+}

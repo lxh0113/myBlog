@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Affix, Button, Space, Input } from "antd";
 import { Carousel } from "antd";
 
@@ -7,11 +7,8 @@ import { SearchOutlined } from "@ant-design/icons";
 import "./css/body.scss";
 import logoText from "../../../assets/image/logoText.png";
 
-import slider1 from "../../../assets/slider/1.gif"
-import slider2 from "../../../assets/slider/2.gif"
-import slider3 from "../../../assets/slider/3.gif"
-import slider4 from "../../../assets/slider/4.gif"
 import { useNavigate } from "react-router-dom";
+import { getCarouselAPI } from "../../../apis/carousel";
 
 export default function Body() {
   let [affix, setAffix] = useState(false);
@@ -21,30 +18,46 @@ export default function Body() {
     console.log(value);
   };
 
-  const sliderImage=[
-   slider1,
-   slider2,
-   slider3,
-   slider4,
-  ]
-
-  const navigate=useNavigate()
-  const [searchText,setSearchText]=useState('')
-
-  const toSearch=(e?:any)=>{
-    if(e.key==='Enter')
-    {
-      navigate('/search/'+searchText)
-    }
-    else return
+  interface sliderItem{
+    id:number;
+    url:string;
   }
+
+  const [sliderImage, setSliderImage] = useState<Array<sliderItem>>([]);
+
+  const navigate = useNavigate();
+  const [searchText, setSearchText] = useState("");
+
+  const toSearch = (e?: any) => {
+    if (e.key === "Enter") {
+      navigate("/search/" + searchText);
+    } else return;
+  };
+
+  useEffect(() => {
+    const getCarousels = async () => {
+      const res = await getCarouselAPI();
+
+      if (res.data.code === 200) {
+        setSliderImage(res.data.data);
+      }
+    };
+
+    getCarousels();
+  },[]);
 
   return (
     <div className="homeBodyBox">
       <div className="inputBox">
         <img src={logoText} alt="" />
         <Space.Compact style={{ marginBottom: 20 }}>
-          <Input value={searchText} onChange={(e)=>setSearchText(e.target.value)} onKeyUp={(e)=>toSearch(e)} style={{ height: 50, width: 300 }} placeholder="搜索关键词" />
+          <Input
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            onKeyUp={(e) => toSearch(e)}
+            style={{ height: 50, width: 300 }}
+            placeholder="搜索关键词"
+          />
           <Button
             style={{ height: 50, width: 100 }}
             icon={<SearchOutlined />}
@@ -66,8 +79,9 @@ export default function Body() {
           <div className="affixBox">
             <Space.Compact style={{ marginTop: 20, marginBottom: 20 }}>
               <Input
-              value={searchText} onChange={(e)=>setSearchText(e.target.value)}
-                onKeyUp={(e)=>toSearch(e)}
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                onKeyUp={(e) => toSearch(e)}
                 style={{ height: 40, width: 400 }}
                 placeholder="搜索关键词"
               />
@@ -88,13 +102,13 @@ export default function Body() {
 
       <div className="sliderBox">
         <Carousel autoplay>
-          { sliderImage.map((item,index)=>{
+          {sliderImage.map((item, index) => {
             return (
               <div key={index} className="sliderItem">
-                <img src={item} alt="" />
+                <img src={item.url} alt="" />
               </div>
-            )
-          }) }
+            );
+          })}
         </Carousel>
       </div>
     </div>

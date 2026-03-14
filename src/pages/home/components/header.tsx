@@ -7,35 +7,49 @@ import {
   UserOutlined,
   EditOutlined,
   LogoutOutlined,
+  FileAddFilled,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Dropdown, Space, Button,Badge, message } from "antd";
+import {
+  Dropdown,
+  Space,
+  Button,
+  Badge,
+  message,
+  Modal,
+  Divider,
+  Table,
+} from "antd";
 import { useNavigate } from "react-router-dom";
 
-import { FileAddOutlined } from "@ant-design/icons";
+import { FileAddOutlined, UsergroupAddOutlined } from "@ant-design/icons";
 import useUserStore from "../../../stores/user";
 import { useEffect, useState } from "react";
 import { getUserDetailsAPI } from "../../../apis/user";
+import {
+  addCooperateArticleAPI,
+  getHistoryCooperateArticleAPI,
+} from "../../../apis/cooperateArticle";
+import { CooperateArticle } from "../../../types";
 
 export default function Header() {
+  const toProfile = () => {
+    navigate("/profile");
+  };
 
-  const toProfile=()=>{
-    navigate('/profile')
-  }
+  const toLogin = () => {
+    navigate("/login");
+  };
 
-  const toLogin=()=>{
-    navigate('/login')
-  }
+  const toContent = () => {
+    navigate("/content");
+  };
 
-  const toContent=()=>{
-    navigate('/content')
-  }
+  const toMessage = () => {
+    navigate("/message/1");
+  };
 
-  const toMessage=()=>{
-    navigate('/message/1')
-  }
-
-  const user=useUserStore((state:any)=>state.user)
+  const user = useUserStore((state: any) => state.user);
 
   const navigate = useNavigate();
 
@@ -43,31 +57,29 @@ export default function Header() {
     navigate("/");
   };
 
-  const toEdit=()=>{
-    navigate('/edit')
-  }
+  const toEdit = () => {
+    navigate("/edit");
+  };
 
-  const [userInfo,setUserInfo]=useState({
-    articles:0,
-    love:0,
-    follow:0,
-    fans:0,
-    isFollow:false
-  })
+  const [userInfo, setUserInfo] = useState({
+    articles: 0,
+    love: 0,
+    follow: 0,
+    fans: 0,
+    isFollow: false,
+  });
 
-  useEffect(()=>{
-    const getUserInfo=async()=>{
+  useEffect(() => {
+    const getUserInfo = async () => {
       const res = await getUserDetailsAPI(user.id);
 
-      if(res.data.code===200)
-      {
-        setUserInfo(res.data.data)
-      }
-      else message.error(res.data.msg)
-    }
+      if (res.data.code === 200) {
+        setUserInfo(res.data.data);
+      } else message.error(res.data.msg);
+    };
 
-    getUserInfo()
-  },[])
+    getUserInfo();
+  }, []);
 
   const items: MenuProps["items"] = [
     {
@@ -105,7 +117,9 @@ export default function Header() {
               flex: 1,
             }}
           >
-            <span style={{ fontSize: 20, fontWeight: "bold" }}>{userInfo.fans}</span>
+            <span style={{ fontSize: 20, fontWeight: "bold" }}>
+              {userInfo.fans}
+            </span>
             <span style={{ color: "gray" }}>粉丝</span>
           </div>
           <div
@@ -116,7 +130,9 @@ export default function Header() {
               flex: 1,
             }}
           >
-            <span style={{ fontSize: 20, fontWeight: "bold" }}>{userInfo.follow}</span>
+            <span style={{ fontSize: 20, fontWeight: "bold" }}>
+              {userInfo.follow}
+            </span>
             <span style={{ color: "gray" }}>关注</span>
           </div>
           <div
@@ -127,7 +143,9 @@ export default function Header() {
               flex: 1,
             }}
           >
-            <span style={{ fontSize: 20, fontWeight: "bold" }}>{userInfo.articles}</span>
+            <span style={{ fontSize: 20, fontWeight: "bold" }}>
+              {userInfo.articles}
+            </span>
             <span style={{ color: "gray" }}>文章</span>
           </div>
         </div>
@@ -136,28 +154,98 @@ export default function Header() {
     {
       key: "2",
       danger: true,
-      label: (
-        <span onClick={toProfile}>个人中心</span>
-      ),
+      label: <span onClick={toProfile}>个人中心</span>,
       icon: <UserOutlined />,
     },
     {
       key: "3",
       danger: true,
-      label: (
-        <span onClick={toContent}>内容管理</span>
-      ),
+      label: <span onClick={toContent}>内容管理</span>,
       icon: <EditOutlined />,
     },
     {
       key: "3",
       danger: true,
-      label: (
-        <span onClick={toLogin}>退出登录</span>
-      ),
+      label: <span onClick={toLogin}>退出登录</span>,
       icon: <LogoutOutlined />,
     },
   ];
+
+  // 协作模块
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleNewCoDuc = async () => {
+    const res = await addCooperateArticleAPI(user.id);
+
+    if (res.data.code === 200) {
+      toCooperation(res.data.data);
+    } else {
+      message.error("新增失败");
+    }
+  };
+
+  const [dataSource, setDataSource] = useState<Array<CooperateArticle>>([]);
+
+  const columns = [
+    {
+      title: "标题",
+      dataIndex: "title",
+      key: "title",
+    },
+    {
+      title: "修改时间",
+      dataIndex: "time",
+      key: "time",
+    },
+    {
+      title: "操作",
+      key: "action",
+      render: (_, record) => {
+        return (
+          <Button
+            color="default"
+            variant="outlined"
+            onClick={() => toCooperation(record.id)}
+          >
+            选择
+          </Button>
+        );
+      },
+    },
+  ];
+
+  const toCooperation = (id: number) => {
+    // 创建新的
+    handleCancel();
+    navigate("/cooperation/" + id);
+  };
+
+  const getHistoryArticle = async () => {
+    const res = await getHistoryCooperateArticleAPI(user.id, 1, 5);
+
+    if (res.data.code === 200) {
+      setDataSource(res.data.data.records);
+    } else {
+      message.error(res.data.msg);
+    }
+  };
+
+  useEffect(() => {
+    getHistoryArticle();
+  }, []);
 
   return (
     <div className="homeHeaderBox">
@@ -176,7 +264,7 @@ export default function Header() {
             </Space>
           </a>
         </Dropdown>
-        <Badge count={2} showZero>
+        <Badge showZero>
           <Button
             onClick={toMessage}
             danger
@@ -201,7 +289,38 @@ export default function Header() {
         >
           发布文章
         </Button>
+        <Button
+          style={{ marginLeft: 20, borderRadius: 20, height: 40 }}
+          type="default"
+          icon={<UsergroupAddOutlined />}
+          onClick={showModal}
+        >
+          协作文档
+        </Button>
       </div>
+      <Modal
+        title="创建协作文档"
+        closable={{ "aria-label": "Custom Close Button" }}
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={[
+          <Button type="default" onClick={handleCancel}>
+            取消
+          </Button>,
+          <Button
+            type="primary"
+            icon={<FileAddFilled></FileAddFilled>}
+            onClick={handleNewCoDuc}
+          >
+            新文档
+          </Button>,
+        ]}
+      >
+        <p style={{ marginTop: "30px" }}>选择历史文档</p>
+        <Divider />
+        <Table dataSource={dataSource} columns={columns} />;
+      </Modal>
     </div>
   );
 }

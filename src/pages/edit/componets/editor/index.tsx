@@ -6,7 +6,7 @@ import { IDomEditor, IEditorConfig, IToolbarConfig } from "@wangeditor/editor";
 
 import { Input } from "antd";
 import "./index.scss";
-
+import useUserStore from "../../../../stores/user";
 function MyEditor(props: any) {
   // editor 实例
   const [editor, setEditor] = useState<IDomEditor | null>(null); // TS 语法
@@ -24,6 +24,8 @@ function MyEditor(props: any) {
   // 工具栏配置
   const toolbarConfig: Partial<IToolbarConfig> = {}; // TS 语法
 
+  const user=useUserStore((state:any)=>state.user)
+
   // 编辑器配置
   let editorConfig: Partial<IEditorConfig> = {
     // TS 语法
@@ -33,6 +35,9 @@ function MyEditor(props: any) {
         fieldName: "file",
         server: "http://localhost:8080/api/upload/editor",
         allowedFileTypes: ["image/*"],
+        meta:{
+          userName:user.username
+        },
         onSuccess(file: File, res: any) {  // TS 语法
           // onSuccess(file, res) {          // JS 语法
               console.log(`${file.name} 上传成功`, res)

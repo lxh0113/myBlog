@@ -13,12 +13,15 @@ const Profile = lazy(() => import("../pages/profile"));
 const Search = lazy(() => import("../pages/search"));
 const Content = lazy(() => import("../pages/content"));
 const Meesgae = lazy(() => import("../pages/message"));
+const Yjs = lazy(() => import("../pages/yjs"));
 
 const Back = lazy(() => import("../pages/back"));
 const BackImage = lazy(() => import("../pages/back/homeImage"));
 const BackArticle = lazy(() => import("../pages/back/article"));
 const BackComments = lazy(() => import("../pages/back/comments"));
 const BackUser = lazy(() => import("../pages/back/user"));
+const BackComplain = lazy(() => import("../pages/back/complain"));
+const BackStatistics = lazy(() => import("../pages/back/statistics"));
 
 const router = createBrowserRouter([
   {
@@ -86,6 +89,14 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: "cooperation/:id",
+    element: (
+      <Suspense fallback={"加载中……"}>
+        <Yjs></Yjs>
+      </Suspense>
+    ),
+  },
+  {
     path: "back",
     element: (
       <Suspense fallback={"加载中……"}>
@@ -122,6 +133,22 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={"加载中……"}>
             <BackUser></BackUser>
+          </Suspense>
+        ),
+      },
+      {
+        path: "complain",
+        element: (
+          <Suspense fallback={"加载中……"}>
+            <BackComplain></BackComplain>
+          </Suspense>
+        ),
+      },
+      {
+        path: "statistics",
+        element: (
+          <Suspense fallback={"加载中……"}>
+            <BackStatistics></BackStatistics>
           </Suspense>
         ),
       },

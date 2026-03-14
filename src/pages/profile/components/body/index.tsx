@@ -32,6 +32,9 @@ export default function Body() {
     },
   ]);
 
+  const myUserInfo=useUserStore((state:any)=>state.user)
+  const setMyUserInfo = useUserStore((state: any) => state.setUserInfo);
+
   const onChange: UploadProps["onChange"] = ({
     file,
     fileList: newFileList,
@@ -88,6 +91,8 @@ export default function Body() {
     if (res.data.code === 200) {
       message.success("修改成功");
       userForm.setFieldsValue(res.data.data);
+      setMyUserInfo(res.data.data)
+      console.log(myUserInfo)
     } else message.error(res.data.msg);
   };
 

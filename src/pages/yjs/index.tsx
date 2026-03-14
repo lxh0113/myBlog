@@ -1,15 +1,11 @@
-import Header from "./components/header";
-import Body from "./components/body";
+import Header from "../home/components/header";
+import Quill from "./components/quill";
 
-import {  ConfigProvider } from "antd";
-
-import { Outlet } from "react-router-dom";
+import { ConfigProvider } from "antd";
 
 import "./index.scss";
 
-import AIChat from "../../pages/chat/index";
-
-export default function Home() {
+export default function Search() {
   return (
     <ConfigProvider
       theme={{
@@ -22,11 +18,9 @@ export default function Home() {
         },
       }}
     >
-      <div className="homeBody">
+      <div className="yjsHomeBox">
         <Header></Header>
-        <Body></Body>
-        <Outlet></Outlet>
-        <AIChat></AIChat>
+        <Quill></Quill>
       </div>
     </ConfigProvider>
   );

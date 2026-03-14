@@ -1,0 +1,35 @@
+@media screen {
+}
+
+.chatBox {
+  img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .sc-launcher,
+  .sc-launcher .sc-open-icon,
+  .sc-launcher .sc-closed-icon {
+    bottom: 100px;
+  }
+
+  .sc-chat-window {
+    width: 600px;
+  }
+
+  .sc-user-input {
+    width: 600px;
+  }
+
+  .sc-user-input--text {
+    width: 520px;
+  }
+
+  .sc-message {
+    width: 540px;
+  }
+
+  .sc-message--avatar {
+    background-image: url(../../assets/image/ai.gif) !important;
+  }
+}

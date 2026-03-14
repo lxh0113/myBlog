@@ -9,6 +9,8 @@ import {
   UserOutlined,
   FileWordOutlined,
   MenuOutlined,
+  InfoCircleOutlined,
+  AreaChartOutlined
 } from "@ant-design/icons";
 import { Button, Layout, Menu, theme } from "antd";
 
@@ -102,6 +104,24 @@ export default function Back() {
                     </span>
                   ),
                 },
+                {
+                  key: "5",
+                  icon: <InfoCircleOutlined onClick={()=>toContent("complain")}/>,
+                  label: (
+                    <span onClick={()=>toContent("complain")}>
+                        违规管理
+                    </span>
+                  ),
+                },
+                // {
+                //   key: "6",
+                //   icon: <AreaChartOutlined onClick={()=>toContent("statistics")} />,
+                //   label: (
+                //     <span onClick={()=>toContent("statistics")}>
+                //         数据统计
+                //     </span>
+                //   ),
+                // },
               ]}
             />
           </Sider>

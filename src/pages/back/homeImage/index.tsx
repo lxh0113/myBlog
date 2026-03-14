@@ -2,8 +2,9 @@ import "./index.scss";
 
 import { useEffect, useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
-import { Image, Upload } from "antd";
+import { Image, message, Upload } from "antd";
 import type { GetProp, UploadFile, UploadProps } from "antd";
+import { addCarouselAPI, deleteCarouselAPI, getCarouselAPI } from "../../../apis/carousel";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
@@ -18,32 +19,7 @@ const getBase64 = (file: FileType): Promise<string> =>
 export default function HomeImage() {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
-  const [fileList, setFileList] = useState<UploadFile[]>([
-    {
-      uid: "-1",
-      name: "image.png",
-      status: "done",
-      url: "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
-    },
-    {
-      uid: "-2",
-      name: "image.png",
-      status: "done",
-      url: "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
-    },
-    {
-      uid: "-3",
-      name: "image.png",
-      status: "done",
-      url: "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
-    },
-    {
-      uid: "-4",
-      name: "image.png",
-      status: "done",
-      url: "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
-    },
-  ]);
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
 
   const handlePreview = async (file: UploadFile) => {
     if (!file.url && !file.preview) {
@@ -54,17 +30,44 @@ export default function HomeImage() {
     setPreviewOpen(true);
   };
 
+  const addCarousel=async (url:string)=>{
+    console.log(url)
+    const res = await addCarouselAPI(url);
+
+    if(res.data.code===200){
+      setImageFlag(imageFlag + 1);
+    }
+    else {
+      message.error("上传出错")
+    }
+  }
+
   const handleChange: UploadProps["onChange"] = ({
     file,
     fileList: newFileList,
   }) => {
-    // setFileList(newFileList);
-
+    setFileList(newFileList)
     if (file.status === "done") {
-      console.log(file.response.data);
-      setImageFlag(imageFlag+1)
+
+      addCarousel(file.response.data)
     }
   };
+
+  const deleteCarousel=async(id:number)=>{
+    const res= await deleteCarouselAPI(id);
+
+    if(res.data.code===200){
+      message.success("删除成功")
+    }
+    else {
+      message.error("操作失败")
+    }
+  }
+
+  const handleRemove:UploadProps['onRemove']=((file)=>{
+    console.log(file)
+    deleteCarousel(parseInt(file.uid))
+  })
 
   const uploadButton = (
     <button style={{ border: 0, background: "none" }} type="button">
@@ -73,15 +76,30 @@ export default function HomeImage() {
     </button>
   );
 
-  const [imageFlag,setImageFlag]=useState(0)
+  const [imageFlag, setImageFlag] = useState(0);
 
-  useEffect(()=>{
-    const getImage=()=>{
-        
-    }
+  useEffect(() => {
+    const getImage = async () => {
+      const res = await getCarouselAPI();
 
-    getImage()
-  },[imageFlag])
+      if (res.data.code === 200) {
+        setFileList(
+          res.data.data.map((item: any) => {
+            return {
+              uid: item.id,
+              name: item.id + ".png",
+              status: "done",
+              url: item.url,
+            };
+          })
+        );
+      } else {
+        message.error("出错啦");
+      }
+    };
+
+    getImage();
+  }, [imageFlag]);
 
   return (
     <div className="myHomeImageBox">
@@ -92,6 +110,7 @@ export default function HomeImage() {
         fileList={fileList}
         onPreview={handlePreview}
         onChange={handleChange}
+        onRemove={handleRemove}
       >
         {fileList.length >= 8 ? null : uploadButton}
       </Upload>

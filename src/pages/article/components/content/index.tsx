@@ -2,7 +2,7 @@ import "./index.scss";
 import { useEffect, useState } from "react";
 
 import { message, Tag } from "antd";
-import { Drawer, Modal, Input, Space } from "antd";
+import { Drawer, Modal, Select, Input, Space } from "antd";
 import Comments from "../commets";
 import classnames from "classnames";
 
@@ -25,13 +25,11 @@ import { ArticleCollection, ArticleInfo } from "../../../../types";
 import dayjs from "dayjs";
 import { addFansAPI, deleteFansAPI } from "../../../../apis/fans";
 import { addLoveAPI, deleteLoveAPI } from "../../../../apis/love";
-import {
-  addCollectionAPI,
-} from "../../../../apis/collection";
+import { addCollectionAPI } from "../../../../apis/collection";
 import {
   changeCollectionOfArticleAPI,
   deleteCollectAPI,
-  getArticleCollectAPI
+  getArticleCollectAPI,
 } from "../../../../apis/collect";
 
 export default function Content() {
@@ -154,11 +152,11 @@ export default function Content() {
 
     if (res.data.code === 200) {
       message.success("添加成功");
-      setIsCollect(false)
+      setIsCollect(false);
       // 重新获取
-      setCollectionFlag(collectionFlag+1)
+      setCollectionFlag(collectionFlag + 1);
     } else message.error(res.data.msg);
-    setIsModalOpen(false)
+    setIsModalOpen(false);
   };
 
   const [collectionFlag, setCollectionFlag] = useState(0);
@@ -188,7 +186,7 @@ export default function Content() {
       setArticleInfo({
         ...articleInfo!,
         collect: articleInfo?.collect! - 1,
-        userIsCollect:false
+        userIsCollect: false,
       });
     } else message.error(res.data.msg);
   };
@@ -209,10 +207,21 @@ export default function Content() {
       setArticleInfo({
         ...articleInfo!,
         collect: articleInfo?.collect! + 1,
-        userIsCollect:true
+        userIsCollect: true,
       });
     } else message.error(res.data.msg);
   };
+
+  const { TextArea } = Input;
+  const [complainModal, setComplainModal] = useState(false);
+  const [complainData, setComplainData] = useState({
+    userId: user.id,
+    complainArticle: articleInfo?.article?.id,
+    type: 2,
+    reason: "",
+  });
+
+  const dealComplain = () => {};
 
   return (
     <div className="myArticleContentBox">
@@ -306,6 +315,20 @@ export default function Content() {
                 关注
               </Button>
             ))}
+
+          {user.id !== articleInfo?.user.id && (
+            <>
+              <Button
+                onClick={() => setComplainModal(true)}
+                style={{ marginLeft: "10px" }}
+                shape="round"
+                type="primary"
+                size="large"
+              >
+                举报
+              </Button>
+            </>
+          )}
         </div>
         <div className="right">
           <span
@@ -353,7 +376,7 @@ export default function Content() {
         onClose={onColumnClose}
         open={openColumn}
       >
-      <ColumnContent id={articleInfo?.article!.userId!}></ColumnContent>
+        <ColumnContent id={articleInfo?.article!.userId!}></ColumnContent>
       </Drawer>
 
       <Modal
@@ -418,6 +441,43 @@ export default function Content() {
             </div>
           );
         })}
+      </Modal>
+
+      <Modal
+        title="举报"
+        open={complainModal}
+        onOk={() => setComplainModal(false)}
+        onCancel={() => setComplainModal(false)}
+      >
+        <Select
+          value={complainData.type}
+          style={{ width: 240 }}
+          onChange={(value) =>
+            setComplainData({
+              ...complainData,
+              type: value,
+            })
+          }
+          options={[
+            { value: 1, label: "色情，暴力" },
+            { value: 2, label: "不当言论(涉政，歧视等)" },
+            { value: 3, label: "抄袭，侵权" },
+          ]}
+        />
+
+        <TextArea
+
+          rows={4}
+          placeholder="50字以内说明原因"
+          style={{marginTop:'20px'}}
+          maxLength={50}
+          onChange={(value: any) =>
+            setComplainData({
+              ...complainData,
+              reason: value,
+            })
+          }
+        />
       </Modal>
     </div>
   );

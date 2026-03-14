@@ -9,7 +9,11 @@ import type { Love } from "./modules/love";
 import type { Collection, ArticleCollection } from "./modules/collection";
 import type { Collect } from "./modules/collect";
 import type { Browse, BrowseGroup, BrowseHistory } from "./modules/browse";
-import type { Message, MessageCommon,MessageFriend } from "./modules/message";
+import type { Message, MessageCommon, MessageFriend } from "./modules/message";
+
+import type { Complain } from "./modules/complain";
+
+import type { CooperateArticle } from "./modules/cooperateArticle";
 
 export {
   User,
@@ -33,4 +37,6 @@ export {
   Message,
   MessageCommon,
   MessageFriend,
+  Complain,
+  CooperateArticle,
 };

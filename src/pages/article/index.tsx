@@ -17,17 +17,16 @@ export default function Article() {
   // 看文章
   useEffect(() => {
     // alert(1)
-    const browse =async () => {
+    const browse = async () => {
       const res = await addBrowseAPI({
         id: null,
         articleId: parseInt(param.id as string),
         userId: user.id,
+        date: new Date(),
       });
 
-      if(res.data.code===200){
-
-      }
-      else message.error(res.data.msg)
+      if (res.data.code === 200) {
+      } else message.error(res.data.msg);
     };
 
     browse();

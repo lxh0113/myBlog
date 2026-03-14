@@ -17,6 +17,7 @@ import {
   saveArticleAPI,
 } from "../../apis/article";
 import { changeArticleLabelsAPI } from "../../apis/articleLabel";
+import AIChat from "../chat";
 
 export default function Edit() {
   const user = useUserStore((state: any) => state.user);
@@ -36,7 +37,7 @@ export default function Edit() {
   });
 
   let [content, setContent] = useState("");
-  const [reloadFlag,setReloadFlag]=useState(0)
+  const [reloadFlag, setReloadFlag] = useState(0);
 
   const [articleLabels, addArticleLabels] = useState([]);
 
@@ -66,7 +67,7 @@ export default function Edit() {
           addArticleLabels(
             res.data.data.labels.map((item: any) => {
               return item.id;
-            })
+            }),
           );
         } else {
           message.error(res.data.msg);
@@ -106,13 +107,13 @@ export default function Edit() {
             articleId: res.data.data.id,
             labelId: item,
           };
-        })
+        }),
       );
 
       if (response.data.code === 200) {
         message.success("保存成功");
-        navigate('/edit/'+res.data.data.id)
-        setReloadFlag(reloadFlag+1)
+        navigate("/edit/" + res.data.data.id);
+        setReloadFlag(reloadFlag + 1);
       } else message.error(response.data.msg);
     } else message.error("保存失败");
   };
@@ -138,14 +139,14 @@ export default function Edit() {
             articleId: res.data.data.id,
             labelId: item,
           };
-        })
+        }),
       );
 
       if (response.data.code === 200) {
         message.success("发布成功");
-        setTimeout(()=>{
-          navigate("/content")
-        },2000)
+        setTimeout(() => {
+          navigate("/content");
+        }, 2000);
       } else message.error(response.data.msg);
     } else message.error(res.data.msg);
   };
@@ -167,18 +168,23 @@ export default function Edit() {
     >
       <div className="homeBody">
         <Header></Header>
+        <div style={{ zIndex: 99999 }}>
+          <AIChat></AIChat>
+        </div>
         <MyEditor
           title={article.title}
           content={article.content}
           changeTitle={changeTitle}
           changeContent={changeContent}
         ></MyEditor>
+
         <Settings
           article={article}
           setArticle={setArticle}
           articleLabels={articleLabels}
           addArticleLabels={addArticleLabels}
         ></Settings>
+
         <Buttom save={save} publish={publish}></Buttom>
       </div>
     </ConfigProvider>

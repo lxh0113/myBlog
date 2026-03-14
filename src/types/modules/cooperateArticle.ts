@@ -5,5 +5,5 @@ export interface CooperateArticle {
   savedBy: number | null;
   createdBy?: number | null;
   version: string | null;
-  time: Date;
+  time: string | null;
 }

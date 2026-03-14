@@ -10,9 +10,9 @@ export const addCooperateArticleAPI = (userId: number) => {
 
 export const saveCooperateArticleAPI = (cooperateArticle: CooperateArticle) => {
   return http({
-    url: "'/cooperate/save",
+    url: "/cooperate/save",
     method: "POST",
-    data: { cooperateArticle },
+    data: cooperateArticle,
   });
 };
 
@@ -36,5 +36,12 @@ export const getHistoryCooperateArticleAPI = (
       current,
       size,
     },
+  });
+};
+
+export const getCooperateArticleAPI = (id: number) => {
+  return http({
+    url: "/cooperate/details/" + id,
+    method: "GET",
   });
 };

@@ -7,7 +7,7 @@ import { WebsocketProvider } from "y-websocket";
 import * as Yjs from "yjs";
 import { wsUrl } from "@config";
 import { useParams } from "react-router";
-import { Button, Divider, Drawer, Select, Space } from "antd";
+import { Button, Divider, Drawer, message, Modal, Select, Space } from "antd";
 
 import "./index.scss";
 import useUserStore from "../../../../stores/user";
@@ -17,6 +17,7 @@ import {
 } from "../../../../apis/cooperateArticle";
 import type { CooperateArticle } from "../../../../types";
 import dayjs from "dayjs";
+import { convert } from "../../../../utils/ai";
 
 // ========== 静态配置 ==========
 const fontSizeStyle = Quill.import("attributors/style/size");
@@ -60,7 +61,8 @@ const Editor: React.FC = () => {
 
   const [isSaver, setIsSaver] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [selectedText, setSelectedText] = useState(""); // 新增：选中的文本
+  const [selectedText, setSelectedText] = useState("");
+  const [canEdit, setCanEdit] = useState(false); // 新增：是否有编辑权限
 
   const ydocRef = useRef<Yjs.Doc | null>(null);
   const providerRef = useRef<WebsocketProvider | null>(null);
@@ -73,17 +75,24 @@ const Editor: React.FC = () => {
   const user = useUserStore((state: any) => state.user);
 
   // 获取文档ID
-  const { id } = useParams();
-  const docId = React.useMemo(() => parseInt(id || "1"), [id]);
+  // 直接从路径中提取 ID
+  const docId = React.useMemo(() => {
+    const match = location.pathname.match(/\/cooperation\/(\d+)/);
+    if (match) {
+      return parseInt(match[1]);
+    }
+    return 1;
+  }, [location.pathname]);
 
   // 文章状态
   const [cooperateArticle, setCooperateArticle] = useState<CooperateArticle>({
     id: docId,
-    time: new Date(),
+    time: dayjs(new Date()).format("YYYY/MM/DD HH:mm:ss"),
     title: "",
     content: "",
     savedBy: user?.id,
     version: dayjs(new Date()).format("YYYY/MM/DD HH:mm:ss"),
+    role: "view", // 默认只读权限
   });
 
   // 用户ID引用
@@ -92,6 +101,15 @@ const Editor: React.FC = () => {
       userIdRef.current = user.id;
     }
   }, [user]);
+
+  // ========== 检查编辑权限 ==========
+  const checkEditPermission = useCallback((article: CooperateArticle) => {
+    // 如果当前用户是文章创建者 或者 文章权限是edit，则有编辑权限
+    const hasEditPermission =
+      userIdRef.current === article.createdBy || article.role === "edit";
+    setCanEdit(hasEditPermission);
+    return hasEditPermission;
+  }, []);
 
   // ========== 获取文章详情 ==========
   const fetchArticleDetail = useCallback(async () => {
@@ -104,23 +122,30 @@ const Editor: React.FC = () => {
         const articleData = res.data.data;
         console.log("获取到的文章内容:", articleData.content);
 
-        setCooperateArticle({
+        const newArticle = {
           id: articleData.id,
           time: articleData.time || new Date(),
           title: articleData.title || "",
           content: articleData.content || "",
           savedBy: articleData.savedBy,
+          createdBy: articleData.createdBy,
           version:
             articleData.version ||
             dayjs(new Date()).format("YYYY/MM/DD HH:mm:ss"),
-        });
+          role: articleData.role || "view",
+        };
+
+        setCooperateArticle(newArticle);
+
+        // 检查编辑权限
+        checkEditPermission(newArticle);
       }
     } catch (error) {
       console.error("获取文章详情失败:", error);
     } finally {
       setLoading(false);
     }
-  }, [docId]);
+  }, [docId, checkEditPermission]);
 
   // 组件加载时获取文章详情
   useEffect(() => {
@@ -148,6 +173,10 @@ const Editor: React.FC = () => {
   // 执行保存的函数
   const performSave = useCallback(async () => {
     if (!ydocRef.current || !quillRef.current) return;
+    if (!canEdit) {
+      console.log("无编辑权限，跳过保存");
+      return;
+    }
 
     try {
       const content = quillRef.current.root.innerHTML;
@@ -174,7 +203,7 @@ const Editor: React.FC = () => {
     } catch (error) {
       console.error("保存出错:", error);
     }
-  }, [saveCooperateArticle]);
+  }, [saveCooperateArticle, canEdit]);
 
   // 选举保存者
   const electSaver = useCallback((awareness: any) => {
@@ -211,29 +240,27 @@ const Editor: React.FC = () => {
       theme: "snow",
       placeholder: "请输入内容",
       modules: {
-        toolbar: toolbarOptions,
+        toolbar: canEdit ? toolbarOptions : false, // 根据权限控制工具栏
         history: { userOnly: true },
         cursors: true,
       },
+      readOnly: !canEdit, // 根据权限设置只读模式
     });
 
     quillRef.current = quill;
 
-    // ========== 新增：监听选中文本变化 ==========
+    // 监听选中文本变化（只读模式下也需要显示选中文本）
     quill.on(
       "selection-change",
       (range: any, oldRange: any, source: string) => {
         if (range) {
           if (range.length > 0) {
-            // 有选中的文本
             const text = quill.getText(range.index, range.length);
             setSelectedText(text);
           } else {
-            // 只是光标位置，没有选中文本
             setSelectedText("");
           }
         } else {
-          // 编辑器失去焦点
           setSelectedText("");
         }
       },
@@ -260,6 +287,7 @@ const Editor: React.FC = () => {
       id: userIdRef.current,
       name: user?.username || "匿名用户",
       color: userColor,
+      canEdit, // 将编辑权限同步给其他用户
     });
 
     // 5. 绑定 Quill 和 Yjs
@@ -287,19 +315,15 @@ const Editor: React.FC = () => {
       ) {
         console.log("设置初始内容到 Quill");
 
-        // 临时移除事件监听，避免触发额外的渲染
         quill.off("selection-change");
         quill.off("text-change");
 
-        // 转换并设置内容
         const tempDelta = quill.clipboard.convert({
           html: cooperateArticle.content,
         });
 
-        // 使用 silent 方式设置内容
         quill.setContents(tempDelta, "silent");
 
-        // 重新添加事件监听
         quill.on("selection-change", (range: any) => {
           if (range && range.length > 0) {
             const text = quill.getText(range.index, range.length);
@@ -338,10 +362,12 @@ const Editor: React.FC = () => {
       quillBindingRef.current = null;
       isContentSetRef.current = false;
     };
-  }, [docId, user, loading]); // 移除 cooperateArticle.content 依赖
+  }, [docId, user, loading, canEdit]); // 添加 canEdit 依赖
 
   // 自动保存逻辑
   useEffect(() => {
+    if (!canEdit) return; // 无编辑权限时不启动自动保存
+
     const startAutoSave = () => {
       if (saveIntervalRef.current) {
         clearInterval(saveIntervalRef.current);
@@ -376,10 +402,12 @@ const Editor: React.FC = () => {
         clearInterval(saveIntervalRef.current);
       }
     };
-  }, [isSaver, performSave]);
+  }, [isSaver, performSave, canEdit]);
 
   // 页面关闭前的保存
   useEffect(() => {
+    if (!canEdit) return; // 无编辑权限时不保存
+
     const handleBeforeUnload = () => {
       if (ydocRef.current && quillRef.current) {
         const content = quillRef.current.root.innerHTML;
@@ -391,12 +419,13 @@ const Editor: React.FC = () => {
               content,
               version: dayjs(new Date()).format("YYYY/MM/DD HH:mm:ss"),
               savedBy: userIdRef.current,
+              role: cooperateArticle.role,
             }),
           ],
           { type: "application/json" },
         );
 
-        navigator.sendBeacon("/api/cooperate-article/save", blob);
+        navigator.sendBeacon("http://locahost:8080/api/cooperate/save", blob);
       }
     };
 
@@ -405,17 +434,18 @@ const Editor: React.FC = () => {
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [cooperateArticle.title, docId]);
+  }, [cooperateArticle.title, docId, canEdit, cooperateArticle.role]);
 
   // 标题修改处理
   const handleTitleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (!canEdit) return; // 无编辑权限不能修改标题
       setCooperateArticle((prev) => ({
         ...prev,
         title: e.target.value,
       }));
     },
-    [],
+    [canEdit],
   );
 
   const [open, setOpen] = useState(false);
@@ -428,11 +458,105 @@ const Editor: React.FC = () => {
     setOpen(false);
   };
 
-  const [type, setType] = useState("lucy");
+  const [type, setType] = useState("polish");
 
   const handleChange = (value: string) => {
     console.log(`selected ${value}`);
     setType(value);
+  };
+
+  // 如果需要保留富文本格式
+  const replaceSelectedText = () => {
+    if (!quillRef.current) {
+      message.warning("编辑器未初始化");
+      return;
+    }
+
+    if (!convertedContent) {
+      message.warning("没有可替换的内容");
+      return;
+    }
+
+    const selection = quillRef.current.getSelection();
+    if (!selection || selection.length === 0) {
+      message.warning("请先选中要替换的文本");
+      return;
+    }
+
+    // 尝试从 convertedContent 中获取原始文本（如果有存储）
+    // 由于 convertedContent 是 JSX，你可能需要在 convert 函数中也返回纯文本
+    // 这里简单处理：提取纯文本
+    const extractTextFromJSX = (node: React.ReactNode): string => {
+      if (typeof node === "string") return node;
+      if (typeof node === "number") return String(node);
+      if (Array.isArray(node)) return node.map(extractTextFromJSX).join("");
+      if (React.isValidElement(node)) {
+        const element = node as React.ReactElement;
+        const children = element.props.children;
+        if (children) return extractTextFromJSX(children);
+      }
+      return "";
+    };
+
+    const newText = extractTextFromJSX(convertedContent);
+
+    if (!newText) {
+      message.warning("无法提取替换内容");
+      return;
+    }
+
+    const { index, length } = selection;
+
+    // 删除选中内容
+    quillRef.current.deleteText(index, length);
+    // 插入新内容
+    quillRef.current.insertText(index, newText);
+
+    // 重新选中新插入的内容
+    quillRef.current.setSelection(index, newText.length);
+
+    message.success("已替换选中内容");
+  };
+
+  const [convertedContent, setConvertedContent] =
+    useState<React.ReactNode>(null);
+
+  const handleConvert = async () => {
+    const result = await convert(type, selectedText, setConvertedContent);
+    setConvertedContent(result);
+  };
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
+  const [role, setRole] = useState("view");
+
+  const handleRoleChange = (value) => {
+    setRole(value);
+  };
+
+  const setArticleRole = async () => {
+    // 这里调用更新文章权限的API
+    console.log("设置文章权限为:", role);
+  };
+
+  const getLink = async () => {
+    await setArticleRole();
+    // 复制链接到剪贴板
+    const link = `${window.location.origin}/cooperate/${docId}`;
+    await navigator.clipboard.writeText(link);
+    message.success("链接已经复制到粘贴板上");
   };
 
   return (
@@ -441,7 +565,26 @@ const Editor: React.FC = () => {
         <div className="loading-container">加载中...</div>
       ) : (
         <>
-          <Button onClick={showDrawer}>文本润色</Button>
+          <Space style={{ marginBottom: 20 }}>
+            {canEdit && ( // 只有有编辑权限才显示这些按钮
+              <>
+                <Button onClick={showDrawer}>文本润色</Button>
+                <Button
+                  type="primary"
+                  onClick={() => message.success("文章已经自动保存")}
+                >
+                  保存
+                </Button>
+              </>
+            )}
+            {/* 创建者才能看到分享按钮 */}
+
+            {userIdRef.current === cooperateArticle.createdBy && (
+              <Button color="purple" type="primary" onClick={showModal}>
+                分享
+              </Button>
+            )}
+          </Space>
           <div className="titleContainer">
             <input
               className="titleInput"
@@ -449,48 +592,88 @@ const Editor: React.FC = () => {
               type="text"
               value={cooperateArticle.title}
               onChange={handleTitleChange}
+              readOnly={!canEdit} // 根据权限设置只读
             />
           </div>
           <div ref={container} />
+          {!canEdit && <div className="readonly-tip">当前文档为只读模式</div>}
         </>
       )}
-      <Drawer
-        title="AI帮手"
-        closable={{ "aria-label": "Close Button" }}
-        onClose={onClose}
-        mask={false}
-        open={open}
-      >
-        <Space style={{ marginBottom: 20 }}>
-          <Select
-            defaultValue="lucy"
-            style={{
-              width: 120,
-              marginBottom: 0,
-            }}
-            value={type}
-            onChange={handleChange}
-            options={[
-              { value: "jack", label: "AI润色" },
-              { value: "lucy", label: "AI翻译" },
-              { value: "Yiminghe", label: "AI扩写" },
-              { value: "lixiaohui", label: "AI纠错" },
-              { value: "lizeyan", label: "AI总结" },
-            ]}
-          />
-          <Button type="primary">转换</Button>
-        </Space>
+      {/* AI润色抽屉 - 只有有编辑权限才能打开 */}
+      {canEdit && (
+        <Drawer
+          title="AI帮手"
+          closable={{ "aria-label": "Close Button" }}
+          onClose={onClose}
+          mask={false}
+          open={open}
+        >
+          <Space style={{ marginBottom: 20 }}>
+            <Select
+              defaultValue="polish"
+              style={{
+                width: 120,
+                marginBottom: 0,
+              }}
+              value={type}
+              onChange={handleChange}
+              options={[
+                { value: "polish", label: "AI润色" },
+                { value: "translate", label: "AI翻译" },
+                { value: "expand", label: "AI扩写" },
+                { value: "correct", label: "AI纠错" },
+                { value: "summary", label: "AI总结" },
+              ]}
+            />
+            <Button type="primary" onClick={handleConvert}>
+              转换
+            </Button>
+          </Space>
 
-        <p>当前选择文本</p>
-        <Divider></Divider>
-        <div className="selected-text">{selectedText || "未选中任何文本"}</div>
-        <Divider />
-        <p>转换后结果</p>
-        <Divider />
-        <div className="converted-content"></div>
-        <Divider />
-        <Button type="primary">替换当前选中内容</Button>
-      </Drawer>
+          <p>当前选择文本</p>
+          <Divider />
+          <div className="selected-text">
+            <p>{selectedText || "未选中任何文本"}</p>
+          </div>
+          <Divider />
+          <p>转换后结果</p>
+          <div className="converted-content">{convertedContent}</div>
+          <Divider />
+          <div className="converted-content"></div>
+          <Divider />
+          <Button type="primary" onClick={replaceSelectedText}>
+            替换当前选中内容
+          </Button>
+        </Drawer>
+      )}
+      {/* 分享弹窗 - 只有创建者才能看到 */}
+      {userIdRef.current === cooperateArticle.createdBy && (
+        <Modal
+          title="分享设置"
+          closable={{ "aria-label": "Custom Close Button" }}
+          open={isModalOpen}
+          footer={null}
+          onOk={handleOk}
+          onCancel={handleCancel}
+        >
+          <Space>
+            <p>获得此链接的人的权限</p>
+            <Select
+              value={role}
+              style={{ width: 120 }}
+              onChange={handleRoleChange}
+              options={[
+                { value: "view", label: "查看" },
+                { value: "edit", label: "编辑" },
+              ]}
+            />
+          </Space>
+          <Divider />
+          <Button type="primary" onClick={getLink}>
+            复制分享链接
+          </Button>
+        </Modal>
+      )}
     </div>
   );
 };

@@ -18,7 +18,7 @@ import {
   message,
   Modal,
   Divider,
-  Table,
+  Table
 } from "antd";
 import { useNavigate } from "react-router-dom";
 
@@ -31,6 +31,7 @@ import {
   getHistoryCooperateArticleAPI,
 } from "../../../apis/cooperateArticle";
 import { CooperateArticle } from "../../../types";
+import dayjs from "dayjs";
 
 export default function Header() {
   const toProfile = () => {
@@ -209,6 +210,9 @@ export default function Header() {
       title: "修改时间",
       dataIndex: "time",
       key: "time",
+      render: (_, { time }) => {
+        return <p>{dayjs(time).format("YYYY/MM/DD hh:mm:ss")}</p>;
+      },
     },
     {
       title: "操作",
@@ -230,7 +234,7 @@ export default function Header() {
   const toCooperation = (id: number) => {
     // 创建新的
     handleCancel();
-    navigate("/cooperation/" + id);
+    navigate(`/cooperation/${id}`);
   };
 
   const getHistoryArticle = async () => {
@@ -319,7 +323,8 @@ export default function Header() {
       >
         <p style={{ marginTop: "30px" }}>选择历史文档</p>
         <Divider />
-        <Table dataSource={dataSource} columns={columns} />;
+        <Table dataSource={dataSource} columns={columns} />
+        {/* <Input style={{ marginBottom: 20 }} placeholder="新文档标题" /> */}
       </Modal>
     </div>
   );

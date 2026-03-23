@@ -18,8 +18,8 @@ class AIChatService {
   private isConnecting = false;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 3;
-  private appid = "f17e53d0";
-  private domain = "spark-x";
+  private appid = "771fd84d";
+  private domain = "generalv3";
   
   // 回调函数，用于更新UI
   private onMessageUpdate: ((messages: Message[]) => void) | null = null;

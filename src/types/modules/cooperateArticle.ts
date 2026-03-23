@@ -6,4 +6,5 @@ export interface CooperateArticle {
   createdBy?: number | null;
   version: string | null;
   time: string | null;
+  role?: string;
 }

@@ -6,6 +6,7 @@ import {
 import { marked } from "marked";
 import { SSEService } from "./sse";
 import DOMPurify from "dompurify";
+import type { ReactNode } from "react";
 
 async function polishText(text: string) {
   const res = await getRewriteTextAPI(text);
@@ -37,31 +38,7 @@ async function polishText(text: string) {
       );
     }
 
-    return (
-      <div
-        style={{ padding: "16px", background: "#fafafa", borderRadius: "8px" }}
-      >
-        <div
-          style={{ fontWeight: "bold", marginBottom: "12px", color: "#333" }}
-        >
-          ✨ 润色结果
-        </div>
-        <div
-          style={{
-            lineHeight: "1.8",
-            fontSize: "14px",
-            whiteSpace: "pre-wrap",
-            wordBreak: "break-word",
-            padding: "16px",
-            background: "#fff",
-            borderRadius: "8px",
-            border: "1px solid #e8e8e8",
-          }}
-        >
-          {polishedText}
-        </div>
-      </div>
-    );
+    return renderMarkdownNode(polishedText);
   } else {
     return (
       <div style={{ padding: "16px", textAlign: "center", color: "#ff4d4f" }}>
@@ -83,45 +60,7 @@ async function translateText(
     const translatedText = res.data.data.result;
     console.log("翻译结果:", translatedText);
 
-    return (
-      <div
-        style={{ padding: "16px", background: "#fafafa", borderRadius: "8px" }}
-      >
-        <div
-          style={{
-            fontWeight: "bold",
-            marginBottom: "12px",
-            color: "#333",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-          }}
-        >
-          <span>🌐 翻译结果</span>
-          <span
-            style={{ fontSize: "12px", color: "#999", fontWeight: "normal" }}
-          >
-            {fromLang === "cn" ? "中文" : fromLang} →{" "}
-            {toLang === "en" ? "英文" : toLang}
-          </span>
-        </div>
-        <div
-          style={{
-            lineHeight: "1.8",
-            fontSize: "14px",
-            whiteSpace: "pre-wrap",
-            wordBreak: "break-word",
-            padding: "16px",
-            background: "#fff",
-            borderRadius: "8px",
-            border: "1px solid #e8e8e8",
-            boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
-          }}
-        >
-          {translatedText}
-        </div>
-      </div>
-    );
+    return renderMarkdownNode(translatedText);
   } else {
     return (
       <div style={{ padding: "16px", textAlign: "center", color: "#ff4d4f" }}>
@@ -136,11 +75,16 @@ marked.setOptions({
   gfm: true,
 });
 
+const renderMarkdownNode = async (content: string): Promise<ReactNode> => {
+  const html = await marked.parse(content || "");
+  return <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }} />;
+};
+
 // 扩写函数 - 实时更新，完成后返回最终 JSX
 async function expandText(
   text: string,
-  setContent: (jsx: React.ReactNode) => void,
-): Promise<React.ReactNode> {
+  setContent: (jsx: ReactNode) => void,
+): Promise<ReactNode> {
   let fullText = "";
   let isCompleted = false;
 
@@ -170,41 +114,7 @@ async function expandText(
         const parsed = JSON.parse(data);
         if (parsed.chunk) {
           fullText += parsed.chunk;
-          const html = await marked.parse(fullText);
-
-          setContent(
-            <div
-              style={{
-                padding: "16px",
-                background: "#fafafa",
-                borderRadius: "8px",
-              }}
-            >
-              <div
-                style={{
-                  fontWeight: "bold",
-                  marginBottom: "12px",
-                  color: "#333",
-                }}
-              >
-                ✨ 扩写结果{" "}
-                <span style={{ fontSize: "12px", color: "#1890ff" }}>
-                  生成中...
-                </span>
-              </div>
-              <div
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }}
-                style={{
-                  lineHeight: "1.8",
-                  fontSize: "14px",
-                  padding: "16px",
-                  background: "#fff",
-                  borderRadius: "8px",
-                  border: "1px solid #e8e8e8",
-                }}
-              />
-            </div>,
-          );
+          setContent(await renderMarkdownNode(fullText));
         }
       } catch (e) {
         console.error("解析错误:", e);
@@ -217,33 +127,13 @@ async function expandText(
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
 
-  const html = await marked.parse(fullText);
-  return (
-    <div
-      style={{ padding: "16px", background: "#fafafa", borderRadius: "8px" }}
-    >
-      <div style={{ fontWeight: "bold", marginBottom: "12px", color: "#333" }}>
-        ✨ 扩写结果
-      </div>
-      <div
-        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }}
-        style={{
-          lineHeight: "1.8",
-          fontSize: "14px",
-          padding: "16px",
-          background: "#fff",
-          borderRadius: "8px",
-          border: "1px solid #e8e8e8",
-        }}
-      />
-    </div>
-  );
+  return renderMarkdownNode(fullText);
 }
 
 // 总结函数 - 实时更新，完成后返回最终 JSX
 async function summaryText(
   text: string,
-  setContent: (jsx: React.ReactNode) => void,
+  setContent: (jsx: ReactNode) => void,
   options?: {
     summaryLength?: string;
     summaryStyle?: string;
@@ -251,7 +141,7 @@ async function summaryText(
     extractKeywords?: string;
     includeAnalysis?: string;
   },
-): Promise<React.ReactNode> {
+): Promise<ReactNode> {
   let fullText = "";
   let isCompleted = false;
 
@@ -280,41 +170,7 @@ async function summaryText(
         const parsed = JSON.parse(data);
         if (parsed.chunk) {
           fullText += parsed.chunk;
-          const html = await marked.parse(fullText);
-
-          setContent(
-            <div
-              style={{
-                padding: "16px",
-                background: "#fafafa",
-                borderRadius: "8px",
-              }}
-            >
-              <div
-                style={{
-                  fontWeight: "bold",
-                  marginBottom: "12px",
-                  color: "#333",
-                }}
-              >
-                📝 总结结果{" "}
-                <span style={{ fontSize: "12px", color: "#1890ff" }}>
-                  生成中...
-                </span>
-              </div>
-              <div
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }}
-                style={{
-                  lineHeight: "1.8",
-                  fontSize: "14px",
-                  padding: "16px",
-                  background: "#fff",
-                  borderRadius: "8px",
-                  border: "1px solid #e8e8e8",
-                }}
-              />
-            </div>,
-          );
+          setContent(await renderMarkdownNode(fullText));
         }
       } catch (e) {
         console.error("解析错误:", e);
@@ -327,27 +183,7 @@ async function summaryText(
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
 
-  const html = await marked.parse(fullText);
-  return (
-    <div
-      style={{ padding: "16px", background: "#fafafa", borderRadius: "8px" }}
-    >
-      <div style={{ fontWeight: "bold", marginBottom: "12px", color: "#333" }}>
-        📝 总结结果
-      </div>
-      <div
-        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }}
-        style={{
-          lineHeight: "1.8",
-          fontSize: "14px",
-          padding: "16px",
-          background: "#fff",
-          borderRadius: "8px",
-          border: "1px solid #e8e8e8",
-        }}
-      />
-    </div>
-  );
+  return renderMarkdownNode(fullText);
 }
 
 async function correctText(text: string) {
@@ -756,7 +592,7 @@ async function correctText(text: string) {
 export const convert = (
   type: string,
   text: string,
-  setContent?: (jsx: React.ReactNode) => void,
+  setContent: (jsx: ReactNode) => void = () => {},
 ) => {
   switch (type) {
     case "polish":
@@ -766,7 +602,7 @@ export const convert = (
       return translateText(text);
       break;
     case "expand":
-      return expandText(text, setContent!);
+      return expandText(text, setContent);
       break;
     case "correct":
       return correctText(text);

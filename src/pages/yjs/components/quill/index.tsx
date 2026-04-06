@@ -483,37 +483,46 @@ const Editor: React.FC = () => {
       return;
     }
 
-    // 尝试从 convertedContent 中获取原始文本（如果有存储）
-    // 由于 convertedContent 是 JSX，你可能需要在 convert 函数中也返回纯文本
-    // 这里简单处理：提取纯文本
-    const extractTextFromJSX = (node: React.ReactNode): string => {
+    const extractHtmlFromNode = (node: React.ReactNode): string => {
+      if (!node) return "";
       if (typeof node === "string") return node;
       if (typeof node === "number") return String(node);
-      if (Array.isArray(node)) return node.map(extractTextFromJSX).join("");
-      if (React.isValidElement(node)) {
-        const element = node as React.ReactElement;
-        const children = element.props.children;
-        if (children) return extractTextFromJSX(children);
+      if (Array.isArray(node)) {
+        return node.map((item) => extractHtmlFromNode(item)).join("");
       }
+
+      if (React.isValidElement(node)) {
+        const element = node as React.ReactElement<any>;
+        const props = element.props || {};
+
+        if (props.dangerouslySetInnerHTML?.__html) {
+          return props.dangerouslySetInnerHTML.__html;
+        }
+
+        if (props.children) {
+          return extractHtmlFromNode(props.children);
+        }
+      }
+
       return "";
     };
 
-    const newText = extractTextFromJSX(convertedContent);
+    const htmlContent = extractHtmlFromNode(convertedContent)?.trim();
 
-    if (!newText) {
-      message.warning("无法提取替换内容");
+    if (!htmlContent) {
+      message.warning("无法提取 markdown 内容");
       return;
     }
 
     const { index, length } = selection;
+    const quill = quillRef.current;
+    const prevLen = quill.getLength();
 
-    // 删除选中内容
-    quillRef.current.deleteText(index, length);
-    // 插入新内容
-    quillRef.current.insertText(index, newText);
+    quill.deleteText(index, length, "user");
+    quill.clipboard.dangerouslyPasteHTML(index, htmlContent, "user");
 
-    // 重新选中新插入的内容
-    quillRef.current.setSelection(index, newText.length);
+    const insertedLength = quill.getLength() - prevLen + length;
+    quill.setSelection(index, insertedLength, "user");
 
     message.success("已替换选中内容");
   };
@@ -637,10 +646,11 @@ const Editor: React.FC = () => {
           </div>
           <Divider />
           <p>转换后结果</p>
+          <Divider />
           <div className="converted-content">{convertedContent}</div>
           <Divider />
-          <div className="converted-content"></div>
-          <Divider />
+          {/* <div className="converted-content"></div> */}
+          {/* <Divider /> */}
           <Button type="primary" onClick={replaceSelectedText}>
             替换当前选中内容
           </Button>
